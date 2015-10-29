@@ -1,0 +1,10 @@
+#-r wagtailbase/requirements.txt
+#-r ddhldap/requirements.txt
+django
+django-grappelli
+django-model-utils
+psycopg2
+elasticsearch
+django-redis
+redis
+#pillow
