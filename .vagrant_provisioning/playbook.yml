@@ -1,0 +1,283 @@
+---
+- hosts: all
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  sudo: true
+
+  tasks:
+  - name: fix debian sudoers file
+    sudo: yes
+    lineinfile:
+      dest: /etc/sudoers
+      backup: yes
+      regexp: "^%sudo\\s+ALL=\\(ALL:ALL\\)\\s+ALL$"
+      line: "%sudo   ALL=(ALL) NOPASSWD: ALL"
+    tags:
+      - system
+
+  - name: apt | add wheezy backports
+    apt_repository:
+      repo: deb http://http.debian.net/debian wheezy-backports main
+      state: present
+    tags:
+      - system
+
+  - name: apt | install https transport for apt
+    apt:
+      pkg: apt-transport-https
+      state: installed
+      # update_cache: yes
+    tags:
+      -system
+
+  - name: apt | add node key
+    sudo: yes
+    apt_key:
+      url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+      state: present
+    tags:
+      - system
+
+  - name: apt | add nodejs sources
+    apt_repository:
+      repo: 'deb https://deb.nodesource.com/node wheezy main'
+      state: present
+    tags:
+      - system
+
+  - name: apt | add nodejs sourcecode sources
+    apt_repository:
+      repo: 'deb-src https://deb.nodesource.com/node wheezy main'
+      state: present
+    tags:
+      - system
+
+  - name: apt | add elasticsearch key
+    sudo: yes
+    apt_key:
+      url: https://packages.elastic.co/GPG-KEY-elasticsearch
+      state: present
+    tags:
+      - system
+
+  - name: apt | add elasticsearch sources
+    apt_repository:
+      repo: 'deb http://packages.elastic.co/elasticsearch/1.6/debian stable main'
+      state: present
+    tags:
+      - system
+
+  - name: apt | install required system packages
+    apt:
+      pkg: "{{item}}"
+      state: installed
+      update_cache: yes
+    with_items: system_packages
+    tags:
+      - system
+
+  - name: zsh | clone oh-my-zsh repo
+    git: repo={{ zsh.oh_my_zsh }} dest={{ user_home }}/.oh-my-zsh
+    tags:
+      - system
+
+  - name: zsh | deploy .zshrc
+    copy: src={{ zsh.zshrc }} dest={{ user_home }}/.zshrc owner=vagrant
+    tags:
+      - system
+
+  - name: zsh | as default shell
+    user: name=vagrant shell=/bin/zsh
+    tags:
+      - system
+
+  - name: vim | download spf13
+    get_url: url={{ vim.spf13 }} dest={{ vim.spf13_install }}
+    tags:
+      - system
+
+  - name: vim | install spf13
+    sudo_user: vagrant
+    command: sh {{ vim.spf13_install }}
+    tags:
+      - system
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  tasks:
+  - name: pip | setup virtualenv
+    command: mkdir -p {{ python.virtualenv_location }}
+    command: virtualenv {{ python.virtualenv_location }}
+    tags:
+      - python
+
+  - name: pip | update setuptools
+    pip:
+      name: setuptools
+      virtualenv: "{{ python.virtualenv_location }}"
+      state: latest
+    tags:
+      - python
+
+  - name: pip | update pip
+    pip:
+      name: pip
+      virtualenv: "{{ python.virtualenv_location }}"
+      state: latest
+    tags:
+      - python
+
+  - name: pip | ensure python requirements are installed to latest version
+    pip:
+      requirements: "{{ project_root }}/{{ python.requirements }}"
+      virtualenv: "{{ python.virtualenv_location }}"
+    tags:
+      - python
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  # gather_facts: false
+  tasks:
+  - name: locale | setup gb locale
+    locale_gen:
+      name: "{{ postgresql.locale }}"
+      state: present
+    sudo: yes
+    tags:
+      - db
+
+  - name: postgresql | ensure postgresql user can authenticate
+    sudo: yes
+    lineinfile:
+      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      backup: yes
+      regexp: "^local\\s+all\\s+{{ postgresql.admin_user }}\\s+peer$"
+      line: "local\\tall\\t\\t{{ postgresql.admin_user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
+    tags:
+      - db
+
+  - name: postgresql | ensure application user can authenticate
+    sudo: yes
+    lineinfile:
+      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      backup: yes
+      insertafter: "local\\tall\\t\\t{{ postgresql.admin_user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
+      line: "local\\tall\\t\\t{{ postgresql.user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
+    notify:
+      - postgresql | restart postgres
+      - elasticsearch | restart elasticsearch
+    tags:
+      - db
+
+  handlers:
+  - name: postgresql | restart postgres
+    sudo: yes
+    service:
+      name: postgresql
+      state: restarted
+    tags:
+      - db
+
+  - name: elasticsearch | restart elasticsearch
+    sudo: yes
+    service:
+      name: elasticsearch
+      state: started
+    tags:
+      - db
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: postgresql | create user
+    sudo_user: "{{ postgresql.admin_user }}"
+    postgresql_user:
+      user: "{{ postgresql.user }}"
+      password: "{{ app.name }}"
+      role_attr_flags: CREATEDB # NOSUPERUSER NOCREATEROLE
+    tags:
+      - db
+
+  - name: postgresql | create db
+    sudo_user: "{{ postgresql.admin_user }}"
+    postgresql_db:
+      name: "{{ app.name }}"
+      encoding: "{{postgresql.encoding}}"
+      lc_collate: "{{postgresql.locale}}"
+      lc_ctype: "{{postgresql.locale}}"
+      template: "template0"
+      state: present
+      owner: "{{ postgresql.user }}"
+    notify:
+      - postgresql | apply privileges
+    tags:
+      - db
+
+  - name: check if initial data file exists
+    stat:
+      path: "{{ project_root }}/.vagrant_provisioning/{{ postgresql.initial_data_file }}"
+    register: idf
+    tags:
+      - db
+      - data
+
+  - name: posgresql | load initial data file
+    command: psql -U {{ postgresql.user }} -d {{ app.name }} -f {{ project_root }}/.vagrant_provisioning/{{ postgresql.initial_data_file }}
+    when: idf.stat.exists
+    notify:
+      - postgresql | apply privileges after data import
+    tags:
+      - db
+      - data
+
+  handlers:
+  - name: postgresql | apply privileges
+    sudo_user: "{{ postgresql.admin_user }}"
+    postgresql_privs:
+      db: "{{ app.name }}"
+      privs: ALL
+      roles: "{{ postgresql.user }}"
+      state: present
+      type: database
+    tags:
+      - db
+      - data
+
+  - name: postgresql | apply privileges after data import
+    sudo_user: "{{ postgresql.admin_user }}"
+    postgresql_privs:
+      db: "{{ app.name }}"
+      objs: ALL_IN_SCHEMA
+      privs: ALL
+      roles: "{{ postgresql.user }}"
+      state: present
+      type: table
+    tags:
+      - db
+      - data
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: django | default local settings
+    copy: src=local_settings.py dest={{ project_root }}/{{ app.name }}/settings/local.py owner=vagrant
+    tags:
+      - django
+
+  - name: django | migrations
+    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py makemigrations"
+    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py migrate"
+    tags:
+      - django
+
+  # FIXME: this is failing with a connection refused error, as if elasticsearch was not running
+  # - name: django | search index
+  #   command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py update_index"
+  #   tags:
+  #     - django
