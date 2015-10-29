@@ -5,3 +5,7 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec sed -i .sed 's
 find . -path ./.git -prune -o -name '*.sed' -exec rm {} \;
 
 rm -rf .git
+
+cd ..
+mv django-bare-bones $1-django
+cd $1-django
