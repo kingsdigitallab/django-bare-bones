@@ -1,0 +1,16 @@
+{
+    "name": "$PROJECT_NAME",
+    "version": "0.1",
+    "dependencies": {
+        "jquery": null,
+        "foundation": null,
+        "font-awesome": null
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
+}
