@@ -1,1 +1,0 @@
-Placeholder directory for project's assets.
