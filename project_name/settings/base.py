@@ -64,6 +64,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'require',
 )
 
 # INSTALLED_APPS += ws.INSTALLED_APPS
@@ -213,6 +215,8 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder',
 )
 
+STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
+
 MEDIA_URL = STATIC_URL + 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL.strip('/'))
 
@@ -235,6 +239,13 @@ SESSION_COOKIE_SECURE = True
 # http://django-compressor.readthedocs.org/en/latest/
 # -----------------------------------------------------------------------------
 
+COMPRESS_ENABLED = True
+
+COMPRESS_CSS_FILTERS = [
+    # CSS minimizer
+    'compressor.filters.cssmin.CSSMinFilter'
+]
+
 COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
@@ -247,11 +258,60 @@ COMPRESS_PRECOMPILERS = (
 GRAPPELLI_ADMIN_TITLE = PROJECT_TITLE
 
 # -----------------------------------------------------------------------------
+# Django-Require
+# https://github.com/etianen/django-require
+# -----------------------------------------------------------------------------
+
+# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+REQUIRE_BASE_URL = 'assets/js/'
+
+# The name of a build profile to use for your project, relative to
+# REQUIRE_BASE_URL. A sensible value would be 'app.build.js'.
+# Leave blank to use the built-in default build profile. Set to False to
+# disable running the default profile (e.g. if only using it to build
+# Standalone Modules)
+REQUIRE_BUILD_PROFILE = False
+
+# The name of the require.js script used by your project, relative to
+# REQUIRE_BASE_URL.
+REQUIRE_JS = '../vendor/requirejs/require.js'
+
+# A dictionary of standalone modules to build with almond.js.
+# See the section on Standalone Modules, below.
+REQUIRE_STANDALONE_MODULES = {
+    'config': {
+        # Where to output the built module, relative to REQUIRE_BASE_URL.
+        'out': 'config-built.js',
+
+        # Optional: A build profile used to build this standalone module.
+        'build_profile': 'config.build.js',
+    }
+}
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
+
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ('build.txt', )
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and
+# rhino if not.
+REQUIRE_ENVIRONMENT = 'node'
+
+# -----------------------------------------------------------------------------
 # FABRIC
 # -----------------------------------------------------------------------------
 
 import getpass
 FABRIC_USER = getpass.getuser()
+
+# -----------------------------------------------------------------------------
+# GLOBALS FOR JS
+# -----------------------------------------------------------------------------
+
+# Google Analytics ID
+GA_ID = ''
 
 # -----------------------------------------------------------------------------
 # Wagtail
