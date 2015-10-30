@@ -1,0 +1,24 @@
+{% load staticfiles {# wagtailbase_tags #} %}
+<nav class="top-bar primary" data-topbar id="primary-navigation">
+  <ul class="title-area">
+    <li class="name">
+      <!-- Leave empty or fill with title -->
+    </li>
+    <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+  </ul>
+
+  <section class="top-bar-section">
+  {% comment %}
+  {% block main_menu %}
+  {% get_site_root as site_root %}
+  {% main_menu root=site_root current_page=self %}
+  {% endblock %}
+  {% endcomment %}}
+
+    <ul class="right">
+      <li class="has-form">
+        {% include 'includes/search_box.html' %}
+      </li>
+    </ul>
+  </section>
+</nav>

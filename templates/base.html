@@ -1,0 +1,79 @@
+{% load staticfiles compress require %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>{% block meta_title %}{% endblock %}</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- define requirejs config settings. -->
+  <script type="text/javascript">
+    {% include 'includes/config.js' %}
+  </script>
+  {% require_module 'config' %}
+
+  {% compress css %}
+  {# SCSS compilation relies on django compressor #}
+  <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/main.scss' %}" />
+  {% endcompress %}
+
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <div class="wrapper">
+
+    {% include 'includes/header.html' %}
+
+    <div class="main-navigation-container contain-to-grid">
+      {% include 'includes/navigation.html' %}
+    </div>
+
+    <section class="content-section">
+      {% block messages %}
+
+      {% if messages %}
+      <ul id="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% endblock %}
+
+      {% block content_section %}
+      <main>
+        {% block overtitle %}
+        <h1>{% block title %}{% endblock %}</h1>
+        {% endblock %}
+        {% block main %}{% endblock %}
+      </main>
+
+      <div class="sidebar">
+        {% block side_bar %}
+        <aside class="local-navigation">
+          <h4>In this section</h4>
+          {% block local_menu %}{% endblock %}
+        </aside>
+
+        <aside class="latest-post">
+          <h4>Latest post</h4>
+          {% block latest_blog_post %}{% endblock %}
+        </aside>
+
+        {% block side_bar_sections %}{% endblock %}
+        {% endblock %}
+      </div>
+      {% endblock %}
+    </section>
+
+    <footer class="footer-section">
+      {% block footer %}
+      {% include 'includes/footer.html' %}
+      {% endblock %}
+    </footer>
+
+  </div>
+</body>
+</html>
