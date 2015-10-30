@@ -16,7 +16,6 @@ DATABASES = {
 
 LOGGING_LEVEL = logging.DEBUG
 
-LOGGING['loggers']['django_auth_ldap']['level'] = LOGGING_LEVEL
 LOGGING['loggers']['$PROJECT_NAME']['level'] = LOGGING_LEVEL
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
