@@ -55,4 +55,7 @@ try:
     from local import *
 except ImportError:
     print('failed to import local settings')
-    raise ImportError('Error importing local settings')
+
+    from test import *
+    print('the project is running with test settings')
+    print('please create a local settings file')
