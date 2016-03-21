@@ -47,16 +47,11 @@
     {% endblock %}
   </footer>
 
-  {# Foundation and JQuery stuff #}
-  <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
-  <script src="{% static 'vendor/foundation-sites/dist/foundation.min.js' %}"></script>
-
-  {% compress js %}
-  <script src="{% static 'js/app.js' %}"></script>
-  {% endcompress %}
-
-  <script>
-    $(document).foundation();
+  <script type="text/javascript">
+    {% include 'includes/config.js' %}
   </script>
+  {% require_module 'config' %}
+
+  {% block footer_scripts %}{% endblock %}
 </body>
 </html>
