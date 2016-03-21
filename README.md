@@ -15,6 +15,10 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.1
+* Added missing reference to requirejs script from the base template
+* Removed references to wagtail/wagtailbase
+
 # Release 0.2
 * Updated requirejs configuration to work with babeljs
 * Updated the fabric script to work with git
