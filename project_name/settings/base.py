@@ -9,8 +9,6 @@ https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 """
 # from ddhldap.settings import *
 
-# from wagtailbase import settings as ws
-
 import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -68,10 +66,8 @@ INSTALLED_APPS = (
     'require',
 )
 
-# INSTALLED_APPS += ws.INSTALLED_APPS
-
 INSTALLED_APPS += (
-    # 'wagtailbase',
+    # your project apps here
 )
 
 INTERNAL_IPS = ('127.0.0.1', )
@@ -144,9 +140,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # 'wagtail.wagtailcore.middleware.SiteMiddleware',
-    # 'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 ROOT_URLCONF = PROJECT_NAME + '.urls'
@@ -190,9 +183,6 @@ WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
 # -----------------------------------------------------------------------------
 
 # AUTH_LDAP_REQUIRE_GROUP = 'cn=GROUP_NAME,' + LDAP_BASE_OU
-
-# LOGIN_URL = 'wagtailadmin_login'
-# LOGIN_REDIRECT_URL = 'wagtailadmin_home'
 
 
 # -----------------------------------------------------------------------------
@@ -313,26 +303,3 @@ FABRIC_USER = getpass.getuser()
 # Google Analytics ID
 GA_ID = ''
 
-# -----------------------------------------------------------------------------
-# Wagtail
-# http://wagtail.readthedocs.org/en/latest/
-# -----------------------------------------------------------------------------
-
-# WAGTAIL_SITE_NAME = PROJECT_TITLE
-
-# WAGTAILSEARCH_RESULTS_TEMPLATE = 'search_results.html'
-
-# WAGTAILSEARCH_INDEX = PROJECT_NAME
-
-# WAGTAILSEARCH_BACKENDS = {
-#     'default': {
-#         'BACKEND':
-#             'wagtail.wagtailsearch.backends.elasticsearch.ElasticSearch',
-#         'URLS': ['http://127.0.0.1:9200'],
-#         'INDEX': WAGTAILSEARCH_INDEX,
-#         'TIMEOUT': 5,
-#         'FORCE_NEW': False,
-#     }
-# }
-
-# ITEMS_PER_PAGE = ws.ITEMS_PER_PAGE
