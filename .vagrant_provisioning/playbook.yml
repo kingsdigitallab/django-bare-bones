@@ -3,11 +3,11 @@
   vars_files:
     - vars.yml
   gather_facts: false
-  sudo: true
+  become: true
 
   tasks:
   - name: fix debian sudoers file
-    sudo: yes
+    become: yes
     lineinfile:
       dest: /etc/sudoers
       backup: yes
@@ -32,7 +32,7 @@
       -system
 
   - name: apt | add node key
-    sudo: yes
+    become: yes
     apt_key:
       url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
       state: present
@@ -54,7 +54,7 @@
       - system
 
   - name: apt | add elasticsearch key
-    sudo: yes
+    become: yes
     apt_key:
       url: https://packages.elastic.co/GPG-KEY-elasticsearch
       state: present
@@ -70,10 +70,10 @@
 
   - name: apt | install required system packages
     apt:
-      pkg: "{{item}}"
+      pkg: '{{ item }}'
       state: installed
       update_cache: yes
-    with_items: system_packages
+    with_items: '{{ system_packages }}'
     tags:
       - system
 
@@ -89,17 +89,6 @@
 
   - name: zsh | as default shell
     user: name=vagrant shell=/bin/zsh
-    tags:
-      - system
-
-  - name: vim | download spf13
-    get_url: url={{ vim.spf13 }} dest={{ vim.spf13_install }}
-    tags:
-      - system
-
-  - name: vim | install spf13
-    sudo_user: vagrant
-    command: sh {{ vim.spf13_install }}
     tags:
       - system
 
@@ -146,27 +135,17 @@
     locale_gen:
       name: "{{ postgresql.locale }}"
       state: present
-    sudo: yes
+    become: yes
     tags:
       - db
 
   - name: postgresql | ensure postgresql user can authenticate
-    sudo: yes
+    become: yes
     lineinfile:
       dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
       backup: yes
-      regexp: "^local\\s+all\\s+{{ postgresql.admin_user }}\\s+peer$"
-      line: "local\\tall\\t\\t{{ postgresql.admin_user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
-    tags:
-      - db
-
-  - name: postgresql | ensure application user can authenticate
-    sudo: yes
-    lineinfile:
-      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
-      backup: yes
-      insertafter: "local\\tall\\t\\t{{ postgresql.admin_user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
-      line: "local\\tall\\t\\t{{ postgresql.user }}\\t\\t\\t\\t{{ postgresql.default_auth_method }}"
+      regexp: "^local\\s+all\\s+all\\s+peer$"
+      line: "local    all    all    {{ postgresql.default_auth_method }}"
     notify:
       - postgresql | restart postgres
       - elasticsearch | restart elasticsearch
@@ -175,7 +154,7 @@
 
   handlers:
   - name: postgresql | restart postgres
-    sudo: yes
+    become: yes
     service:
       name: postgresql
       state: restarted
@@ -183,7 +162,7 @@
       - db
 
   - name: elasticsearch | restart elasticsearch
-    sudo: yes
+    become: yes
     service:
       name: elasticsearch
       state: started
@@ -195,7 +174,7 @@
     - vars.yml
   tasks:
   - name: postgresql | create user
-    sudo_user: "{{ postgresql.admin_user }}"
+    become_user: "{{ postgresql.admin_user }}"
     postgresql_user:
       user: "{{ postgresql.user }}"
       password: "{{ app.name }}"
@@ -204,7 +183,7 @@
       - db
 
   - name: postgresql | create db
-    sudo_user: "{{ postgresql.admin_user }}"
+    become_user: "{{ postgresql.admin_user }}"
     postgresql_db:
       name: "{{ app.name }}"
       encoding: "{{postgresql.encoding}}"
@@ -237,7 +216,7 @@
 
   handlers:
   - name: postgresql | apply privileges
-    sudo_user: "{{ postgresql.admin_user }}"
+    become_user: "{{ postgresql.admin_user }}"
     postgresql_privs:
       db: "{{ app.name }}"
       privs: ALL
@@ -249,7 +228,7 @@
       - data
 
   - name: postgresql | apply privileges after data import
-    sudo_user: "{{ postgresql.admin_user }}"
+    become_user: "{{ postgresql.admin_user }}"
     postgresql_privs:
       db: "{{ app.name }}"
       objs: ALL_IN_SCHEMA
