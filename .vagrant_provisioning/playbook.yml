@@ -144,6 +144,16 @@
     lineinfile:
       dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
       backup: yes
+      regexp: "^local\\s+all\\s+{{ postgresql.admin_user }}\\s+peer$"
+      line: "local    all    {{ postgresql.admin_user }}    {{ postgresql.default_auth_method }}"
+    tags:
+      - db
+
+  - name: postgresql | ensure all users can authenticate
+    become: yes
+    lineinfile:
+      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      backup: yes
       regexp: "^local\\s+all\\s+all\\s+peer$"
       line: "local    all    all    {{ postgresql.default_auth_method }}"
     notify:
