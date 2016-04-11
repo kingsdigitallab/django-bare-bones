@@ -99,7 +99,7 @@
   tasks:
   - name: pip | setup virtualenv
     command: mkdir -p {{ python.virtualenv_location }}
-    command: virtualenv {{ python.virtualenv_location }}
+  - command: virtualenv {{ python.virtualenv_location }}
     tags:
       - python
 
@@ -261,7 +261,7 @@
 
   - name: django | migrations
     command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py makemigrations"
-    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py migrate"
+  - command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py migrate"
     tags:
       - django
 
