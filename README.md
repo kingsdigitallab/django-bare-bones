@@ -15,6 +15,9 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.3
+* Added more default Python requirements
+
 # Release 0.2.2
 * Fixed ansible deprecation issues
 * Fixed issues setting postgres authentication
