@@ -253,7 +253,7 @@ GRAPPELLI_ADMIN_TITLE = PROJECT_TITLE
 # -----------------------------------------------------------------------------
 
 # The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
-REQUIRE_BASE_URL = 'assets/js/'
+REQUIRE_BASE_URL = 'js'
 
 # The name of a build profile to use for your project, relative to
 # REQUIRE_BASE_URL. A sensible value would be 'app.build.js'.
