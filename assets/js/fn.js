@@ -10,7 +10,8 @@ define([
     'es6!foundation.util.mediaQuery',
     'es6!foundation.util.motion',
     'es6!foundation.util.timerAndImageLoader',
-    'es6!foundation.util.touch'
+    'es6!foundation.util.touch',
+    'es6!foundation.util.triggers'
 ], function(module, $) {
     'use strict';
 
