@@ -15,6 +15,11 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.4
+* Removed Modernizr
+* Cleaned up Foundation dependencies
+* Added comments to set up scss for Foundation and FontAwesome
+
 # Release 0.2.3
 * Added more default Python requirements
 

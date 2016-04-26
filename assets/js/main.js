@@ -2,7 +2,6 @@
 require([
     'requirejs',
     'jquery',
-    'modernizr',
     'fn',
     'ga'
 ], function(r, $) {
