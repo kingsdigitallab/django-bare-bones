@@ -12,15 +12,12 @@
   {# SCSS compilation relies on django compressor #}
   <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/main.scss' %}">
   <!-- FontAwesome -->
-  <link rel="stylesheet" type="text/x-scss" href="{% static 'vendor/font-awesome/scss/font-awesome.scss' %}">
+  {#
+    Copy _variable.scss and font-awesome.scss and change the @import paths
+    to point to the project ones rather than to the vendor folder
+  #}
+  <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/font-awesome.scss' %}">
   {% endcompress %}
-
-  <!-- define requirejs config settings. -->
-  <script type="text/javascript">
-    {% include 'includes/config.js' %}
-  </script>
-  {% require_module 'config' %}
-
 </head>
 <body>
   <header>
@@ -46,7 +43,8 @@
     {% include 'includes/footer.html' %}
     {% endblock %}
   </footer>
-
+  
+  <!-- define requirejs config settings. -->
   <script type="text/javascript">
     {% include 'includes/config.js' %}
   </script>
