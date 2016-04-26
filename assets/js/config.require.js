@@ -16,7 +16,6 @@ requirejs.config({
         'foundation': '../vendor/foundation-sites/js/foundation.core',
         'foundation.dropdown': '../vendor/foundation-sites/js/foundation.dropdown',
         'foundation.equalizer': '../vendor/foundation-sites/js/foundation.equalizer',
-        'foundation.orbit': '../vendor/foundation-sites/js/foundation.orbit',
         'foundation.util.box': '../vendor/foundation-sites/js/foundation.util.box',
         'foundation.util.keyboard': '../vendor/foundation-sites/js/foundation.util.keyboard',
         'foundation.util.mediaQuery': '../vendor/foundation-sites/js/foundation.util.mediaQuery',
@@ -77,15 +76,6 @@ requirejs.config({
             deps: [
                 'foundation',
                 'foundation.util.mediaQuery'
-            ],
-        },
-        'foundation.orbit': {
-            deps: [
-                'foundation',
-                'foundation.util.keyboard',
-                'foundation.util.motion',
-                'foundation.util.timerAndImageLoader',
-                'foundation.util.touch'
             ],
         },
         'modernizr': {
