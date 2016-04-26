@@ -1,5 +1,9 @@
-@import 'settings';
+@import 'settings'; /*	copy the _settings file from the vendor scss
+						folder to the project one */
+						
 @import '../vendor/foundation-sites/scss/foundation';
+
+@import '../vendor/motion-ui/motion-ui';
 
 /** Your custom scss here **/
 

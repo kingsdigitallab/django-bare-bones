@@ -14,25 +14,28 @@ requirejs.config({
 
         // Foundation
         'foundation': '../vendor/foundation-sites/js/foundation.core',
+        'foundation.accordionMenu': '../vendor/foundation-sites/js/foundation.accordionMenu',
+        'foundation.drilldown': '../vendor/foundation-sites/js/foundation.drilldown',
         'foundation.dropdown': '../vendor/foundation-sites/js/foundation.dropdown',
+        'foundation.dropdownMenu': '../vendor/foundation-sites/js/foundation.dropdownMenu',
         'foundation.equalizer': '../vendor/foundation-sites/js/foundation.equalizer',
-        'foundation.orbit': '../vendor/foundation-sites/js/foundation.orbit',
+        'foundation.responsiveMenu': '../vendor/foundation-sites/js/foundation.responsiveMenu',
+        'foundation.responsiveToggle': '../vendor/foundation-sites/js/foundation.responsiveToggle',
         'foundation.util.box': '../vendor/foundation-sites/js/foundation.util.box',
         'foundation.util.keyboard': '../vendor/foundation-sites/js/foundation.util.keyboard',
         'foundation.util.mediaQuery': '../vendor/foundation-sites/js/foundation.util.mediaQuery',
         'foundation.util.motion': '../vendor/foundation-sites/js/foundation.util.motion',
+        'foundation.util.nest': '../vendor/foundation-sites/js/foundation.util.nest',
         'foundation.util.timerAndImageLoader': '../vendor/foundation-sites/js/foundation.util.timerAndImageLoader',
         'foundation.util.touch': '../vendor/foundation-sites/js/foundation.util.touch',
-
-        'modernizr': '../vendor/modernizr/modernizr',
+        'foundation.util.triggers': '../vendor/foundation-sites/js/foundation.util.triggers',
 
         'requirejs': '../vendor/requirejs/require',
     },
     shim: {
         'foundation': {
             deps: [
-                'jquery',
-                'modernizr'
+                'jquery'
             ],
             exports: 'Foundation'
         },
@@ -56,6 +59,11 @@ requirejs.config({
                 'foundation'
             ],
         },
+        'foundation.util.nest': {
+            deps: [
+                'foundation'
+            ],
+        },
         'foundation.util.timerAndImageLoader': {
             deps: [
                 'foundation'
@@ -66,11 +74,41 @@ requirejs.config({
                 'foundation'
             ],
         },
+        'foundation.util.triggers': {
+            deps: [
+                'foundation'
+            ],
+        },
+        'foundation.accordionMenu': {
+            deps: [
+                'foundation',
+                'foundation.util.keyboard',
+                'foundation.util.motion',
+                'foundation.util.nest'
+            ],
+        },
+        'foundation.drilldown': {
+            deps: [
+                'foundation',
+                'foundation.util.keyboard',
+                'foundation.util.motion',
+                'foundation.util.nest'
+            ],
+        },
         'foundation.dropdown': {
             deps: [
                 'foundation',
                 'foundation.util.box',
-                'foundation.util.keyboard'
+                'foundation.util.keyboard',
+                'foundation.util.triggers'
+            ],
+        },
+        'foundation.dropdownMenu': {
+            deps: [
+                'foundation',
+                'foundation.util.box',
+                'foundation.util.keyboard',
+                'foundation.util.nest'
             ],
         },
         'foundation.equalizer': {
@@ -79,17 +117,21 @@ requirejs.config({
                 'foundation.util.mediaQuery'
             ],
         },
-        'foundation.orbit': {
+        'foundation.responsiveMenu': {
             deps: [
                 'foundation',
-                'foundation.util.keyboard',
-                'foundation.util.motion',
-                'foundation.util.timerAndImageLoader',
-                'foundation.util.touch'
+                'foundation.util.triggers',
+                'foundation.util.mediaQuery',
+                'foundation.util.accordionMenu',
+                'foundation.util.drilldown',
+                'foundation.util.dropdownMenu'
             ],
         },
-        'modernizr': {
-            exports: 'Modernizr'
+        'foundation.responsiveToggle': {
+            deps: [
+                'foundation',
+                'foundation.util.mediaQuery'
+            ],
         },
         'ga': {
             exports: '__ga__'
