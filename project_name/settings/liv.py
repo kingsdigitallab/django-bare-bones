@@ -1,4 +1,4 @@
-from base import *
+from base import *  # noqa
 
 CACHE_REDIS_DATABASE = '2'
 CACHES['default']['LOCATION'] = '127.0.0.1:6379:' + CACHE_REDIS_DATABASE
@@ -22,6 +22,6 @@ DATABASES = {
 # -----------------------------------------------------------------------------
 
 try:
-    from local import *
+    from local import *  # noqa
 except ImportError:
     pass
