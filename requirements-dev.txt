@@ -2,4 +2,6 @@
 django-extensions
 django-debug-toolbar
 Fabric
+flake8
 ipython
+tox

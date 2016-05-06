@@ -265,8 +265,23 @@
     tags:
       - django
 
-  # FIXME: this is failing with a connection refused error, as if elasticsearch was not running
-  # - name: django | search index
-  #   command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py update_index"
-  #   tags:
-  #     - django
+- hosts: all
+  vars_files:
+      - vars.yml
+  tasks:
+  - name: git | init
+    command: "git init"
+    args:
+      chdir: "{{ project_root }}"
+    tags:
+      - git
+
+  - name: git | flake8 pre-commit hook
+    command: "{{ user_home }}/venv/bin/flake8 --install-hook"
+    args:
+      chdir: "{{ project_root }}"
+  - command: "git config flake8.strict True"
+    args:
+      chdir: "{{ project_root }}"
+    tags:
+      - git
