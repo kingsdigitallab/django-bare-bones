@@ -14,6 +14,9 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.6
+* Issue fixing
+
 # Release 0.2.5
 * flake8 pre-commit hook added to git during provisioning
     * **Note**:flake8 needs to be installed in the OS where the commits are being done
