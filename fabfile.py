@@ -60,7 +60,7 @@ def liv():
 
 def set_srvr_vars():
     env.path = os.path.join(env.root_path, env.srvr, 'django',
-                            'shakespeare400-django')
+                            '$PROJECT_NAME-django')
     env.within_virtualenv = 'source {}'.format(
         os.path.join(env.envs_path, env.srvr, 'bin', 'activate'))
 
@@ -207,6 +207,6 @@ def clear_cache():
 def touch_wsgi():
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
 
-    with cd(os.path.join(env.path, 'shakespeare400')), \
+    with cd(os.path.join(env.path, '$PROJECT_NAME')), \
             prefix(env.within_virtualenv):
         run('touch wsgi.py')
