@@ -31,28 +31,6 @@
     tags:
       -system
 
-  - name: apt | add node key
-    become: yes
-    apt_key:
-      url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-      state: present
-    tags:
-      - system
-
-  - name: apt | add nodejs sources
-    apt_repository:
-      repo: 'deb https://deb.nodesource.com/node wheezy main'
-      state: present
-    tags:
-      - system
-
-  - name: apt | add nodejs sourcecode sources
-    apt_repository:
-      repo: 'deb-src https://deb.nodesource.com/node wheezy main'
-      state: present
-    tags:
-      - system
-
   - name: apt | add elasticsearch key
     become: yes
     apt_key:
@@ -98,7 +76,7 @@
   gather_facts: false
   tasks:
   - name: pip | setup virtualenv
-    command: mkdir -p {{ python.virtualenv_location }}
+    file: path={{ python.virtualenv_location }} state=directory
   - command: virtualenv {{ python.virtualenv_location }}
     tags:
       - python
@@ -277,7 +255,7 @@
       - git
 
   - name: git | flake8 pre-commit hook
-    command: "{{ user_home }}/venv/bin/flake8 --install-hook"
+    command: "{{ user_home }}/venv/bin/flake8 --install-hook=git"
     args:
       chdir: "{{ project_root }}"
   - command: "git config flake8.strict True"
