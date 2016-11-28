@@ -129,6 +129,7 @@ def deploy(version=None):
     update(version)
     install_requirements()
     own_django_log()
+    fix_permissions()
     migrate()
     collect_static()
     # update_index()
@@ -164,6 +165,25 @@ def own_django_log():
         log_path = os.path.join(env.path, 'logs', 'django.log')
         if run('ls {}'.format(log_path)).succeeded:
             sudo('chown www-data:www-data {}'.format(log_path))
+
+
+@task
+def fix_permissions():
+    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+
+    with quiet():
+        log_path = os.path.join(env.path, 'logs', 'django.log')
+        if run('ls {}'.format(log_path)).succeeded:
+            sudo('setfacl -R -m g:www-data:rwx {}/logs {}/static'.format(
+                env.path))
+            sudo('setfacl -R -d -m g:www-data:rwx {}/logs {}/static'.format(
+                env.path))
+            sudo('setfacl -R -m g:kdl-staff:rwx {}/logs {}/static'.format(
+                env.path))
+            sudo('setfacl -R -d -m g:kdl-staff:rwx {}/logs {}/static'.format(
+                env.path))
+            sudo('chgrp -Rf kdl-staff {}'.format(env.path))
+            sudo('chmod -Rf g+w {}'.format(env.path))
 
 
 @task
