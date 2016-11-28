@@ -58,6 +58,7 @@ target/
 # Local
 .DS_Store
 .babelrc
+.vagrant
 local.py
 logs/
 static/
