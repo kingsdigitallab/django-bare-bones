@@ -14,6 +14,14 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.7
+* Vagrant
+    * Removed node tasks from ansible playbook
+    * Updated the flake8 tasks to be compatible with the latest versions of flake8
+* Fabric, added a task to fix the permissions of the project directory on the server
+* Modified urls to be compatible with Django 1.10
+* Other minor fixes
+
 # Release 0.2.6
 * Issue fixing
 
