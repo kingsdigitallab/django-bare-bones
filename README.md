@@ -14,6 +14,9 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.8
+* Added more file exclusions to flake8 (especially django templates)
+
 # Release 0.2.7
 * Vagrant
     * Removed node tasks from ansible playbook
@@ -49,3 +52,4 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 * Updated requirejs configuration to work with babeljs
 * Updated the fabric script to work with git
 * Added CI configuration files for tox and travis
+
