@@ -52,3 +52,4 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 * Updated requirejs configuration to work with babeljs
 * Updated the fabric script to work with git
 * Added CI configuration files for tox and travis
+
