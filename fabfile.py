@@ -23,7 +23,7 @@ sys.path.append(project_root)
 
 # The name of the Django app for this project
 # Folder that contains wsgi.py
-PROJECT_NAME = 'XXX'
+PROJECT_NAME = '$PROJECT_NAME'
 # Git repository pointer
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
