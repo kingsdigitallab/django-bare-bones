@@ -19,6 +19,7 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 * Shorten the output of the pip install process
 * Improved the fix_permissions task to also reset permission on the virtual env
 * Added more file/folder exclusions to flake8
+* Django Errors are sent by email to ADMINS by default
 
 # Release 0.2.8
 * Added more file exclusions to flake8 (especially django templates)
