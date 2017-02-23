@@ -20,6 +20,7 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 * Improved the fix_permissions task to also reset permission on the virtual env
 * Added more file/folder exclusions to flake8
 * Django Errors are sent by email to ADMINS by default
+* local.py:FABRIC_GATEWAY = 'username@proxy.x' to let fabric work behind proxy
 
 # Release 0.2.8
 * Added more file exclusions to flake8 (especially django templates)

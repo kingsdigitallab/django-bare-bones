@@ -39,6 +39,12 @@ env.envs_path = os.path.join(env.root_path, 'envs')
 
 django.project(PROJECT_NAME)
 
+# Set FABRIC_GATEWAY = 'username@proxy.x' in local.py
+# if you are behind a proxy.
+FABRIC_GATEWAY = getattr(settings, 'FABRIC_GATEWAY', None)
+if FABRIC_GATEWAY:
+    env.forward_agent = True
+    env.gateway = FABRIC_GATEWAY
 
 # Name of linux user who deploys on the remote server
 env.user = settings.FABRIC_USER
