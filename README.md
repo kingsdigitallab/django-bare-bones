@@ -14,6 +14,14 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.2.9
+* Grouped all control variables into one block near the beginning of the script to simplify the project-based customisation
+* Shorten the output of the pip install process
+* Improved the fix_permissions task to also reset permission on the virtual env
+* Added more file/folder exclusions to flake8
+* Django Errors are sent by email to ADMINS by default
+* local.py:FABRIC_GATEWAY = 'username@proxy.x' to let fabric work behind proxy
+
 # Release 0.2.8
 * Added more file exclusions to flake8 (especially django templates)
 
