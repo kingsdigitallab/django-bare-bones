@@ -81,6 +81,13 @@
     tags:
       - python
 
+  - name: pip | Installing fix for setuptools (requirements-setuptools-fix.txt)
+    pip:
+      requirements: "{{ project_root }}/requirements-setuptools-fix.txt"
+      virtualenv: "{{ python.virtualenv_location }}"
+    tags:
+      - python
+
   - name: pip | update setuptools
     pip:
       name: setuptools
