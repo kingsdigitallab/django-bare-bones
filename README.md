@@ -14,6 +14,10 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 7. Remove the bootstrap script `rm bootstrap.sh`
 8. Edit settings and configuration files.
 
+# Release 0.3.1
+* Fixed django version to 1.10. 1.11 has a breaking change for wagtail. We should try to keep these app
+versions fixed where possible.
+
 # Release 0.3
 * Fixed installation of setuptools which is failing due to (not) missing dependencies. Hopefully this is a temporary bug with setuptools. Fixed dependencies are in requirements-setuptools-fix.txt.
 
