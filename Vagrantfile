@@ -35,4 +35,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.hostname = "$PROJECT_NAME.vagrant"
     machine.vm.network "private_network", ip: "192.168.33.99"
   end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
 end
