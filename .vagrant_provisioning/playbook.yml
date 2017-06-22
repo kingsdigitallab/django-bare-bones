@@ -9,17 +9,10 @@
   - name: fix debian sudoers file
     become: yes
     lineinfile:
-      dest: /etc/sudoers
+      path: /etc/sudoers
       backup: yes
       regexp: "^%sudo\\s+ALL=\\(ALL:ALL\\)\\s+ALL$"
       line: "%sudo   ALL=(ALL) NOPASSWD: ALL"
-    tags:
-      - system
-
-  - name: apt | add wheezy backports
-    apt_repository:
-      repo: deb http://http.debian.net/debian wheezy-backports main
-      state: present
     tags:
       - system
 
@@ -27,21 +20,21 @@
     apt:
       pkg: apt-transport-https
       state: installed
-      # update_cache: yes
+      update_cache: yes
     tags:
       -system
 
   - name: apt | add elasticsearch key
     become: yes
     apt_key:
-      url: https://packages.elastic.co/GPG-KEY-elasticsearch
+      url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
     tags:
       - system
 
   - name: apt | add elasticsearch sources
     apt_repository:
-      repo: 'deb http://packages.elastic.co/elasticsearch/1.6/debian stable main'
+      repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
       state: present
     tags:
       - system
@@ -75,16 +68,25 @@
     - vars.yml
   gather_facts: false
   tasks:
-  - name: pip | setup virtualenv
-    file: path={{ python.virtualenv_location }} state=directory
-  - command: virtualenv {{ python.virtualenv_location }}
+  - name: python | make python3 default version
+    become: yes
+    alternatives:
+      link: /usr/bin/python
+      name: python
+      path: /usr/bin/python3
+      priority: 10
+
+  - name: pip | install virtualenv
+    become: yes
+    pip:
+      name: virtualenv
+      state: latest
     tags:
       - python
 
-  - name: pip | Installing fix for setuptools (requirements-setuptools-fix.txt)
-    pip:
-      requirements: "{{ project_root }}/requirements-setuptools-fix.txt"
-      virtualenv: "{{ python.virtualenv_location }}"
+  - name: pip | setup virtualenv
+    file: path={{ python.virtualenv_location }} state=directory
+  - command: virtualenv {{ python.virtualenv_location }}
     tags:
       - python
 
@@ -116,18 +118,25 @@
     - vars.yml
   # gather_facts: false
   tasks:
-  - name: locale | setup gb locale
+  - name: postgresql | setup gb locale
+    become: yes
     locale_gen:
       name: "{{ postgresql.locale }}"
       state: present
+    tags:
+      - db
+
+  - name: postgresql | get installed version
     become: yes
+    shell: 'ls /etc/postgresql/*/main/pg_hba.conf | cut -d / -f4'
+    register: postgresql_version
     tags:
       - db
 
   - name: postgresql | ensure postgresql user can authenticate
     become: yes
     lineinfile:
-      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
       regexp: "^local\\s+all\\s+{{ postgresql.admin_user }}\\s+peer$"
       line: "local    all    {{ postgresql.admin_user }}    {{ postgresql.default_auth_method }}"
@@ -137,7 +146,7 @@
   - name: postgresql | ensure all users can authenticate
     become: yes
     lineinfile:
-      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
       regexp: "^local\\s+all\\s+all\\s+peer$"
       line: "local    all    all    {{ postgresql.default_auth_method }}"
