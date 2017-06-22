@@ -8,3 +8,5 @@ django-redis
 django-require
 psycopg2
 redis
+
+$PH_REQUIREMENTS

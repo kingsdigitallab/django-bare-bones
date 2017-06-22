@@ -60,5 +60,6 @@ target/
 .babelrc
 .vagrant
 local.py
+local_*.py
 logs/
 static/

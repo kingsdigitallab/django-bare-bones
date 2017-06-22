@@ -7,14 +7,19 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 For production settings see
 https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 """
-# from ddhldap.settings import *
+# 
 
+import logging
 import os
+import getpass
+
+$PH_SETTINGS_MODULES
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 PROJECT_NAME = '$PROJECT_NAME'
-PROJECT_TITLE = 'Change the title in the settings'
+PROJECT_TITLE = '$PROJECT_TITLE'
 
 # -----------------------------------------------------------------------------
 # Core Settings
@@ -48,13 +53,14 @@ CSRF_COOKIE_HTTPONLY = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
+    
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 TEMPLATE_DEBUG = False
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,16 +70,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'require',
-)
+]
 
-INSTALLED_APPS += (
-    # your project apps here
-)
+INSTALLED_APPS += [
+   # your project apps here
+
+    $PH_INSTALLED_APPS
+]
 
 INTERNAL_IPS = ('127.0.0.1', )
-
-# https://docs.djangoproject.com/en/dev/topics/logging/
-import logging
 
 LOGGING_ROOT = os.path.join(BASE_DIR, 'logs')
 LOGGING_LEVEL = logging.WARN
@@ -116,11 +121,7 @@ LOGGING = {
             'level': LOGGING_LEVEL,
             'propagate': True
         },
-        # 'django_auth_ldap': {
-        #     'handlers': ['file'],
-        #     'level': LOGGING_LEVEL,
-        #     'propagate': True
-        # },
+        
         '$PROJECT_NAME': {
             'handlers': ['file'],
             'level': LOGGING_LEVEL,
@@ -144,6 +145,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    $PH_MIDDLEWARE
 )
 
 ROOT_URLCONF = PROJECT_NAME + '.urls'
@@ -178,15 +181,6 @@ USE_L10N = False
 USE_TZ = True
 
 WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
-
-
-# -----------------------------------------------------------------------------
-# Authentication
-# https://docs.djangoproject.com/en/dev/ref/settings/#auth
-# https://scm.cch.kcl.ac.uk/hg/ddhldap-django
-# -----------------------------------------------------------------------------
-
-# AUTH_LDAP_REQUIRE_GROUP = 'cn=GROUP_NAME,' + LDAP_BASE_OU
 
 
 # -----------------------------------------------------------------------------
@@ -311,7 +305,6 @@ REQUIRE_ENVIRONMENT = 'node'
 # FABRIC
 # -----------------------------------------------------------------------------
 
-import getpass
 FABRIC_USER = getpass.getuser()
 
 # -----------------------------------------------------------------------------
@@ -320,3 +313,5 @@ FABRIC_USER = getpass.getuser()
 
 # Google Analytics ID
 GA_ID = ''
+
+$PH_SETTINGS_INLINE

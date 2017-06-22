@@ -1,0 +1,1 @@
+from kdl_ldap.settings import * # noqa

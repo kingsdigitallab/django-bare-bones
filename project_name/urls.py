@@ -1,16 +1,16 @@
-# from ddhldap.signal_handlers import register_signal_handlers as \
-#     ddhldap_register_signal_handlers
-
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 
 admin.autodiscover()
-# ddhldap_register_signal_handlers()
+
+$PH_SIGNAL_HANDLERS
 
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
+    $PH_URLS
 ]
 
 # -----------------------------------------------------------------------------

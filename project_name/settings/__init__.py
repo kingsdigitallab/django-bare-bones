@@ -6,4 +6,14 @@
 # imported here. Use it for settings specific to the installation and do not
 # commit to version control.
 # -----------------------------------------------------------------------------
-from dev import *  # noqa
+import os
+env_path = os.getcwd()
+
+if '/liv/' in env_path:
+    from local_liv import *  # noqa
+elif '/stg/' in env_path:
+    from local_stg import * # noqa
+elif '/dev/' in env_path:
+    from local_dev import * # noqa
+else:
+    from local import * # noqa
