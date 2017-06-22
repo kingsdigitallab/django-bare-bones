@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 For production settings see
 https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 """
-# 
 
 import logging
 import os
@@ -51,11 +50,6 @@ CACHES = {
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    
-}
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 TEMPLATE_DEBUG = False
@@ -73,8 +67,7 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS += [
-   # your project apps here
-
+    # your project apps here
     $PH_INSTALLED_APPS
 ]
 
@@ -121,7 +114,6 @@ LOGGING = {
             'level': LOGGING_LEVEL,
             'propagate': True
         },
-        
         '$PROJECT_NAME': {
             'handlers': ['file'],
             'level': LOGGING_LEVEL,
@@ -135,7 +127,6 @@ LOGGING = {
     }
 }
 
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -145,7 +136,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     $PH_MIDDLEWARE
 )
 
@@ -181,7 +171,6 @@ USE_L10N = False
 USE_TZ = True
 
 WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
-
 
 # -----------------------------------------------------------------------------
 # Static files (CSS, JavaScript, Images)
