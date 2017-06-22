@@ -6,7 +6,7 @@ project_root: /vagrant
 python: {requirements: requirements-vagrant.txt, virtualenv_location: /home/vagrant/venv}
 system_packages: [ack-grep, zsh, vim-nox, python-dev, python-pip, python-psycopg2,
   python-setuptools, python-virtualenv, nfs-common, postgresql, postgresql-client,
-  postgresql-server-dev-all, adminer, libldap2-dev, libsasl2-dev, libjpeg-dev, nodejs,
+  postgresql-server-dev-all, adminer, libldap2-dev, libsasl2-dev, libjpeg-dev,
   openjdk-7-jre, elasticsearch, libxml2-dev, libxslt-dev, git, git-core]
 user_home: /home/vagrant
 vim: {spf13: 'http://j.mp/spf13-vim3', spf13_install: /home/vagrant/spf13.install}
