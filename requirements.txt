@@ -1,6 +1,6 @@
-#-r ddhldap/requirements.txt
-django==1.10
+django
 django-compressor
+django-extensions
 django-grappelli
 django-libsass
 django-model-utils
