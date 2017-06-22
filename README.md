@@ -11,8 +11,7 @@ The projects is configured to use [Vagrant](https://www.vagrantup.com/) for loca
     * disconnects from this repository by removing the `.git` directory; the new project can then added to its own repository
     * and renames the project directory to `PROJECT_NAME-django`.
 6. Go into the new project directory `cd ../PROJECT_NAME-django`
-7. Remove the bootstrap script `rm bootstrap.sh`
-8. Edit settings and configuration files.
+7. Edit settings and configuration files.
 
 # Release 0.3.2
 * Added fix for SSH hanging upon login with virtualbox provider.

@@ -70,14 +70,18 @@ BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 
 function func_digger {
     BS_DIGGER_USER_ID=$(whiptail --title "$TITLE" --inputbox "Enter the Activecollab User ID to use for Digger in $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3);
     BS_DIGGER_PROJECT_ID=$(whiptail --title "$TITLE" --inputbox "Enter the Activecollab Project ID to use for Digger in $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3);
-    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_USER_ID:$BS_DIGGER_USER_ID:g' {} \;
-    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_PROJECT_ID:$BS_DIGGER_PROJECT_ID:g' {} \;
+
+    export BS_DIGGER_USER_ID=$BS_DIGGER_USER_ID
+    export BS_DIGGER_PROJECT_ID=$BS_DIGGER_PROJECT_ID
+    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_USER_ID:$ENV{BS_DIGGER_USER_ID}:g' {} \;
+    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_PROJECT_ID:$ENV{BS_DIGGER_PROJECT_ID}:g' {} \;
 }
 
 # LDAP 
 function func_ldap {
     BS_LDAP_GROUP=$(whiptail --title "$TITLE" --inputbox "Enter the LDAP group for $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3)
-    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$LDAP_GROUP:$BS_LDAP_GROUP:g' {} \;
+    export BS_LDAP_GROUP=$BS_LDAP_GROUP
+    find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$LDAP_GROUP:$ENV{BS_LDAP_GROUP}:g' {} \;
 }
 
 # Get Selected Options
@@ -88,13 +92,14 @@ IFS=' ' read -r -a BS_PROJECT_OPTIONS <<< "$BS_SELECTIONS"
 # Build up our placeholder text...
 for option in "${BS_PROJECT_OPTIONS[@]}"
 do
-    BS_PH_SETTINGS_INLINE="$BS_PH_SETTINGS_INLINE\n $(cat .modules/$option/settings_inline)" 
-    BS_PH_SETTINGS_MODULES="$BS_PH_SETTINGS_MODULES\n $(cat .modules/$option/settings_modules)" 
-    BS_PH_INSTALLED_APPS="$BS_PH_INSTALLED_APPS\n $(cat .modules/$option/installed_apps)" 
-    BS_PH_URLS="$BS_PH_URLS\n $(cat .modules/$option/urls)" 
-    BS_PH_MIDDLEWARE="$BS_PH_MIDDLEWARE\n $(cat .modules/$option/middleware)" 
-    BS_PH_REQUIREMENTS="$BS_PH_REQUIREMENTS\n $(cat .modules/$option/requirements)" 
-    BS_PH_SIGNAL_HANDLERS="$BS_PH_SIGNAL_HANDLERS\n $(cat .modules/$option/signal_handlers)" 
+    # Installed apps, urls and middleware require indentation
+    BS_PH_SETTINGS_INLINE=$"$BS_PH_SETTINGS_INLINE\n$(cat .modules/$option/settings_inline)" 
+    BS_PH_SETTINGS_MODULES=$"$BS_PH_SETTINGS_MODULES\n$(cat .modules/$option/settings_modules)" 
+    BS_PH_INSTALLED_APPS=$"$BS_PH_INSTALLED_APPS\n    $(cat .modules/$option/installed_apps)" 
+    BS_PH_URLS=$"$BS_PH_URLS\n    $(cat .modules/$option/urls)" 
+    BS_PH_MIDDLEWARE=$"$BS_PH_MIDDLEWARE\n    $(cat .modules/$option/middleware)" 
+    BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)" 
+    BS_PH_SIGNAL_HANDLERS=$"$BS_PH_SIGNAL_HANDLERS\n$(cat .modules/$option/signal_handlers)" 
 done
 
 # Call option-specific functions
@@ -111,21 +116,33 @@ do
     esac
 done
 
+export BS_PROJECT_KEY=$BS_PROJECT_KEY
+export BS_PROJECT_NAME=$BS_PROJECT_NAME
 
 # Generic Replacements
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$BS_PROJECT_KEY:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_TITLE:$BS_PROJECT_NAME:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$ENV{BS_PROJECT_KEY}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_TITLE:$ENV{BS_PROJECT_NAME}:g' {} \;
+
+
+export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
+export BS_PH_SETTINGS_MODULES=$BS_PH_SETTINGS_MODULES
+export BS_PH_INSTALLED_APPS=$BS_PH_INSTALLED_APPS
+export BS_PH_URLS=$BS_PH_URLS
+export BS_PH_MIDDLEWARE=$BS_PH_MIDDLEWARE
+export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
+export BS_PH_SIGNAL_HANDLERS=$BS_PH_SIGNAL_HANDLERS
 
 # Placeholders
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$BS_PH_SETTINGS_INLINE:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_MODULES:$BS_PH_SETTINGS_MODULES:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_INSTALLED_APPS:$BS_PH_INSTALLED_APPS:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URLS:$BS_PH_URLS:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$BS_PH_MIDDLEWARE:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$BS_PH_REQUIREMENTS:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SIGNAL_HANDLERS:$BS_PH_SIGNAL_HANDLERS:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$ENV{BS_PH_SETTINGS_INLINE}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_MODULES:$ENV{BS_PH_SETTINGS_MODULES}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_INSTALLED_APPS:$ENV{BS_PH_INSTALLED_APPS}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URLS:$ENV{BS_PH_URLS}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$ENV{BS_PH_MIDDLEWARE}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SIGNAL_HANDLERS:$ENV{BS_PH_SIGNAL_HANDLERS}:g' {} \;
 
-# Call generic replacements
+# Fix newlines
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
 
 
 # Tidy Up
@@ -134,11 +151,6 @@ rm -rf .git
 mv project_name "$BS_PROJECT_KEY"
 cd ..
 mv django-bare-bones "$BS_PROJECT_KEY-django"
-cd "$BS_PROJECT_KEY-django"
+rm -f "$BS_PROJECT_KEY-django/bootstrap.sh"
 
-echo 
-echo "#######################################################"
-echo "Configuration done. Please remember to add any required"
-echo "local settings."
-echo "#######################################################"
-echo
+whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
