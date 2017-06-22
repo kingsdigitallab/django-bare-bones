@@ -23,20 +23,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "virtualbox" do |provider|
     provider.customize ["modifyvm", :id, "--memory", "1024"]
-  end
-
-  config.vm.provider "vmware" do |provider|
-    provider.customize ["modifyvm", :id, "--memory", "1024"]
-  end
-
-  # vagrant-hostupdater configuration
-  config.vm.define "$PROJECT_NAME" do |machine|
-    machine.vm.box = "puphpet/debian75-x64"
-    machine.vm.hostname = "$PROJECT_NAME.vagrant"
-    machine.vm.network "private_network", ip: "192.168.33.99"
-  end
-
-  config.vm.provider "virtualbox" do |vb|
-    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    provider.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
 end
