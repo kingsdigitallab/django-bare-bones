@@ -9,5 +9,4 @@ system_packages: [ack-grep, zsh, vim-nox, python-dev, python-pip, python-psycopg
   postgresql-server-dev-all, adminer, libldap2-dev, libsasl2-dev, libjpeg-dev,
   openjdk-7-jre, elasticsearch, libxml2-dev, libxslt-dev, git, git-core]
 user_home: /home/vagrant
-vim: {spf13: 'http://j.mp/spf13-vim3', spf13_install: /home/vagrant/spf13.install}
 zsh: {oh_my_zsh: 'https://github.com/robbyrussell/oh-my-zsh.git', zshrc: zshrc}
