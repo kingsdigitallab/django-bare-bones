@@ -1,0 +1,1 @@
+    url(r'^search/', include(wagtail.wagtailsearch.urls.frontend)),

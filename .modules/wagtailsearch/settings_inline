@@ -1,0 +1,9 @@
+WAGTAILSEARCH_BACKENDS = {
+    'default': {
+        'BACKEND': 'wagtail.wagtailsearch.backends.elasticsearch2',
+        'AUTO_UPDATE': False,
+        'URLS': ['http://127.0.0.1:9200'],
+        'INDEX': '$PROJECT_NAME_wagtail',
+        'TIMEOUT': 5,
+    }
+}
