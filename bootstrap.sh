@@ -124,6 +124,7 @@ export BS_PH_MIDDLEWARE=$BS_PH_MIDDLEWARE
 export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
 export BS_PH_SIGNAL_HANDLERS=$BS_PH_SIGNAL_HANDLERS
 
+
 # Placeholders
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$ENV{BS_PH_SETTINGS_INLINE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_MODULES:$ENV{BS_PH_SETTINGS_MODULES}:g' {} \;
@@ -136,6 +137,9 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
 export BS_PROJECT_NAME=$BS_PROJECT_NAME
+
+# Take backup
+tar -zcf ../.django-bare-bones.tar.gz .
 
 # Generic Replacements
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$ENV{BS_PROJECT_KEY}:g' {} \;
@@ -156,6 +160,10 @@ rm -rf .modules
 mv project_name "$BS_PROJECT_KEY"
 cd ..
 mv django-bare-bones "$BS_PROJECT_KEY-django"
-rm -f "$BS_PROJECT_KEY-django/bootstrap.sh"
+mkdir django-bare-bones && cd django-bare-bones 
+tar -zxf ../.django-bare-bones.tar.gz && rm ../.django-bare-bones.tar.gz
+rm -f "../$BS_PROJECT_KEY-django/bootstrap.sh"
+
+
 
 whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
