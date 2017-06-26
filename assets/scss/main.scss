@@ -1,6 +1,9 @@
 @import 'settings'; /*	copy the _settings file from the vendor scss
 						folder to the project one */
-						
+
+@import 'font-awesome'; /*  copy the _variable.scss and font-awesome.scss files from the vendor scss folder
+                            and change the @import paths folder to the project one */
+
 @import '../vendor/foundation-sites/scss/foundation';
 
 @import '../vendor/motion-ui/motion-ui';

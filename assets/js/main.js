@@ -1,13 +1,5 @@
-// Main
-require([
-    'requirejs',
-    'jquery',
-    'fn',
-    'ga'
-], function(r, $) {
-    'use strict';
+$(document.foundation());
 
-    $(document).ready(function() {
-    });
-
+$(document).ready(function() {
+    // Your JS Here
 });

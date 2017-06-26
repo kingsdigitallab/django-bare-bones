@@ -1,4 +1,4 @@
-{% load staticfiles compress require %}
+{% load staticfiles compress  %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,14 +9,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   {% compress css %}
-  {# SCSS compilation relies on django compressor #}
+  {# SCSS compilation relies on django compressor #}å
   <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/main.scss' %}">
-  <!-- FontAwesome -->
-  {#
-    Copy _variable.scss and font-awesome.scss and change the @import paths
-    to point to the project ones rather than to the vendor folder
-  #}
-  <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/font-awesome.scss' %}">
+z
   {% endcompress %}
 </head>
 <body>
@@ -44,11 +39,27 @@
     {% endblock %}
   </footer>
   
-  <!-- define requirejs config settings. -->
+  <!-- Google Analytics -->
   <script type="text/javascript">
-    {% include 'includes/config.js' %}
+    window.GOOGLE_ANALYTICS = {
+    'ga_id': '{{ GA_ID }}',
+    'domain': '{{ request.META.HTTP_HOST }}',
+  };
   </script>
-  {% require_module 'config' %}
+
+  {% compress js %}
+  <!-- Jquery -->
+  <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
+
+  <!-- Foundation -->
+  <script src="{% static 'vendor/foundation-sites/dist/js/foundation.min.js' %}"></script>
+
+  <!-- Motion UI -->
+  <script src="{% static 'vendor/motion-ui/dist/motion-ui.min.js' %}"></script>
+
+  <!-- Our Main Script -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+  {% endcompress %}
 
   {% block footer_scripts %}{% endblock %}
 </body>
