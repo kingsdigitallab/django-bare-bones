@@ -12,3 +12,4 @@
     'wagtail.contrib.wagtailapi',
     'wagtail.contrib.wagtailroutablepage',
     'wagtail.contrib.table_block',
+    'taggit',

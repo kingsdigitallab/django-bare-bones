@@ -18,7 +18,7 @@ BS_PH_INSTALLED_APPS=""
 BS_PH_URLS=""
 BS_PH_MIDDLEWARE=""
 BS_PH_REQUIREMENTS=""
-BS_PH_SIGNAL_HANDLERS=""
+BS_PH_URL_IMPORTS=""
 
 
 # Variable replacements:
@@ -99,7 +99,7 @@ do
     BS_PH_URLS=$"$BS_PH_URLS\n$(cat .modules/$option/urls)" 
     BS_PH_MIDDLEWARE=$"$BS_PH_MIDDLEWARE\n$(cat .modules/$option/middleware)" 
     BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)" 
-    BS_PH_SIGNAL_HANDLERS=$"$BS_PH_SIGNAL_HANDLERS\n$(cat .modules/$option/signal_handlers)" 
+    BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)" 
 done
 
 # Call option-specific functions
@@ -116,13 +116,16 @@ do
     esac
 done
 
+# Take backup
+tar -zcf ../.django-bare-bones.tar.gz .
+
 export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
 export BS_PH_SETTINGS_MODULES=$BS_PH_SETTINGS_MODULES
 export BS_PH_INSTALLED_APPS=$BS_PH_INSTALLED_APPS
 export BS_PH_URLS=$BS_PH_URLS
 export BS_PH_MIDDLEWARE=$BS_PH_MIDDLEWARE
 export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
-export BS_PH_SIGNAL_HANDLERS=$BS_PH_SIGNAL_HANDLERS
+export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
 
 
 # Placeholders
@@ -132,14 +135,13 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URLS:$ENV{BS_PH_URLS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$ENV{BS_PH_MIDDLEWARE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SIGNAL_HANDLERS:$ENV{BS_PH_SIGNAL_HANDLERS}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URL_IMPORTS:$ENV{BS_PH_URL_IMPORTS}:g' {} \;
 
 
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
 export BS_PROJECT_NAME=$BS_PROJECT_NAME
 
-# Take backup
-tar -zcf ../.django-bare-bones.tar.gz .
+
 
 # Generic Replacements
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$ENV{BS_PROJECT_KEY}:g' {} \;

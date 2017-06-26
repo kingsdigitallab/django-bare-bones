@@ -1,0 +1,1 @@
+from wagtail.wagtailsearch.urls import frontend as wagtailsearch_frontend_urls

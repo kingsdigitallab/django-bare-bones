@@ -2,8 +2,10 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 
+$PH_URL_IMPORTS
+
 admin.autodiscover()
-$PH_SIGNAL_HANDLERS
+
 urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),

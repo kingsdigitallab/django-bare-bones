@@ -1,3 +1,3 @@
-    url(r'^wagtail/', include(wagtail.wagtailadmin.urls)),
-    url(r'^documents/', include(wagtail.wagtaildocs.urls)),
-    url(r'', include(wagtail.wagtailcore.urls)),
+    url(r'^wagtail/', include(wagtailadmin_urls)),
+    url(r'^documents/', include(wagtaildocs_urls)),
+    url(r'', include(wagtail_urls)),
