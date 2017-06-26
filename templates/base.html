@@ -38,14 +38,6 @@ z
     {% include 'includes/footer.html' %}
     {% endblock %}
   </footer>
-  
-  <!-- Google Analytics -->
-  <script type="text/javascript">
-    window.GOOGLE_ANALYTICS = {
-    'ga_id': '{{ GA_ID }}',
-    'domain': '{{ request.META.HTTP_HOST }}',
-  };
-  </script>
 
   {% compress js %}
   <!-- Jquery -->
@@ -59,6 +51,15 @@ z
 
   <!-- Our Main Script -->
   <script src="{% static 'assets/js/main.js' %}"></script>
+
+  <!-- Google Analytics -->
+  <script src="{% static 'assets/js/google_analytics.js' %}"></script>
+  <script>
+    ga('create', '{{ GA_ID }}', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Googe Analytics -->
+
   {% endcompress %}
 
   {% block footer_scripts %}{% endblock %}

@@ -2,7 +2,6 @@
     "name": "$PROJECT_NAME",
     "version": "0.1",
     "dependencies": {
-        "almond": null,
         "jquery": null,
         "foundation-sites": null,
         "font-awesome": null,
