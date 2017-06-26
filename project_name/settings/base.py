@@ -52,7 +52,6 @@ CSRF_COOKIE_HTTPONLY = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-TEMPLATE_DEBUG = False
 
 INSTALLED_APPS = [
     'grappelli',
@@ -63,9 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'django_extensions',
-
-    'require',
+    'django_extensions'
 ]
 
 INSTALLED_APPS += [
@@ -194,8 +191,6 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder',
 )
 
-STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
-
 MEDIA_URL = STATIC_URL + 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL.strip('/'))
 
@@ -249,48 +244,6 @@ COMPRESS_PRECOMPILERS = (
 # -----------------------------------------------------------------------------
 
 GRAPPELLI_ADMIN_TITLE = PROJECT_TITLE
-
-# -----------------------------------------------------------------------------
-# Django-Require
-# https://github.com/etianen/django-require
-# -----------------------------------------------------------------------------
-
-# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
-REQUIRE_BASE_URL = 'js'
-
-# The name of a build profile to use for your project, relative to
-# REQUIRE_BASE_URL. A sensible value would be 'app.build.js'.
-# Leave blank to use the built-in default build profile. Set to False to
-# disable running the default profile (e.g. if only using it to build
-# Standalone Modules)
-REQUIRE_BUILD_PROFILE = False
-
-# The name of the require.js script used by your project, relative to
-# REQUIRE_BASE_URL.
-REQUIRE_JS = '../vendor/requirejs/require.js'
-
-# A dictionary of standalone modules to build with almond.js.
-# See the section on Standalone Modules, below.
-REQUIRE_STANDALONE_MODULES = {
-    'config': {
-        # Where to output the built module, relative to REQUIRE_BASE_URL.
-        'out': 'config-built.js',
-
-        # Optional: A build profile used to build this standalone module.
-        'build_profile': 'config.build.js',
-    }
-}
-
-# Whether to run django-require in debug mode.
-REQUIRE_DEBUG = DEBUG
-
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ('build.txt', )
-
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and
-# rhino if not.
-REQUIRE_ENVIRONMENT = 'node'
 
 # -----------------------------------------------------------------------------
 # FABRIC
