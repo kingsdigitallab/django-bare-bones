@@ -8,9 +8,9 @@ For production settings see
 https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 """
 
+import getpass
 import logging
 import os
-import getpass
 
 $PH_SETTINGS_MODULES
 
