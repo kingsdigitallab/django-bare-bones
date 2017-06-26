@@ -6,4 +6,4 @@
 # imported here. Use it for settings specific to the installation and do not
 # commit to version control.
 # -----------------------------------------------------------------------------
-from local import * # oqa
+from local import * # noqa

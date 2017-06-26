@@ -1,3 +1,4 @@
+    'rest_framework',
     'wagtail.wagtailcore',
     'wagtail.wagtailadmin',
     'wagtail.wagtaildocs',
