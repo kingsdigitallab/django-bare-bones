@@ -34,6 +34,9 @@ BS_PH_URL_IMPORTS=""
 # Define our system variables
 TITLE="New KDL Project Setup"
 
+# Stop homebrew automatically updating itself...
+export HOMEBREW_NO_AUTO_UPDATE=1
+
 # First of all, check if we're on OS X:
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Check if Homebrew is installed
