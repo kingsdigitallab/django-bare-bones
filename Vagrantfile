@@ -16,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "virtualbox" do |provider|
     provider.customize ["modifyvm", :id, "--memory", "2048"]
-    provider.name = $PROJECT_NAME
+    provider.name = "$PROJECT_NAME"
   end
 
   config.vm.provision "ansible" do |ansible|
