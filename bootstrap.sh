@@ -40,7 +40,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 # First of all, check if we're on OS X:
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Check if Homebrew is installed
-    which -s brew
+    which brew
     if [[ $? != 0 ]] ; then
         # Install Homebrew
         echo "- Installing Homebrew (this will only need to be done once)"
@@ -58,14 +58,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # Autopep8 and Isort
-which -s autopep8
+which autopep8
 if [[ $? != 0 ]] ; then
     # Install Autopep8
     echo "- Installing Autopep8"
     sudo pip install autopep8
 fi
 
-which -s isort
+which isort
 if [[ $? != 0 ]] ; then
     # Install Isort
     echo "- Installing Isort"
