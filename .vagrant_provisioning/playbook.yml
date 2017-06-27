@@ -39,6 +39,14 @@
     tags:
       - system
 
+  - name: apt | removing apache from base box
+    apt:
+      pkg: 'apache2'
+      state: absent
+      purge: yes
+    tags:
+      - system
+
   - name: apt | install required system packages
     apt:
       pkg: '{{ item }}'
