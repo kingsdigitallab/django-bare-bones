@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
     $PH_URLS
+    $PH_CATCH_ALL_URL
 ]
 
 # -----------------------------------------------------------------------------

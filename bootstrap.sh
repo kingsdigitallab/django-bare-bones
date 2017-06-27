@@ -156,10 +156,8 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URL_IMPORTS:$ENV{BS_PH_URL_IMPORTS}:g' {} \;
 
-
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
 export BS_PROJECT_NAME=$BS_PROJECT_NAME
-
 
 
 # Generic Replacements
@@ -174,6 +172,31 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 # Fix newlines
 echo "- Fixing new lines"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
+
+
+# Check if a catch-all URL exists and move it if needed
+echo "- Cleaning up URLs"
+
+# Find any catch all URLs
+LINE_COUNTER=1
+while read line; do
+    let LINE_COUNTER=LINE_COUNTER+1
+    if [[ $line =~ "url(r''" ]] ; then
+        export BS_CATCH_ALL_URL=$line
+        LINE_COUNTER+="d"
+        sed -i".bak" "$LINE_COUNTER" project_name/urls.py
+        rm project_name/urls.py.bak
+        break
+    fi
+done <project_name/urls.py
+
+if [ -z ${BS_CATCH_ALL_URL+x} ]; then
+    # No catch all URL, remove the placeholder
+    perl -pi -e 's:\$PH_CATCH_ALL_URL:"":g' project_name/urls.py
+else
+    # Move the catch all url
+    perl -pi -e 's:\$PH_CATCH_ALL_URL:$ENV{BS_CATCH_ALL_URL}:g' project_name/urls.py
+fi
 
 
 # Tidy Up
