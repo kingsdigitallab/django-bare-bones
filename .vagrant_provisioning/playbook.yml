@@ -48,6 +48,12 @@
     tags:
       - system
 
+  - name: Upgrade all packages to the latest version
+    apt:
+      upgrade: yes
+    tags:
+      - system
+
   - name: zsh | clone oh-my-zsh repo
     git: repo={{ zsh.oh_my_zsh }} dest={{ user_home }}/.oh-my-zsh
     tags:
