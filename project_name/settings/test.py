@@ -1,7 +1,7 @@
 from .base import *  # noqa
 
 DEBUG = True
-TEMPLATES['OPTIONS']['debug'] = True
+TEMPLATES[0]['OPTIONS']['debug'] = True
 
 SECRET_KEY = 'test'
 
