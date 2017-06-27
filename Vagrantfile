@@ -1,7 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -16,8 +15,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "private_network", ip: "192.168.20.17"
 
   config.vm.provider "virtualbox" do |provider|
-    provider.customize ["modifyvm", :id, "--memory", "1024"]
-    provider.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    provider.customize ["modifyvm", :id, "--memory", "2048"]
+    provider.name = $PROJECT_NAME
   end
 
   config.vm.provision "ansible" do |ansible|
