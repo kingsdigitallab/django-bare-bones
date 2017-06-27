@@ -1,3 +1,4 @@
 AC_BASE_URL = 'https://app.activecollab.com/148987/api/v1/'
 AC_PROJECT_ID = $DIGGER_PROJECT_ID
 AC_USER = $DIGGER_USER_ID
+AC_TOKEN = ''
