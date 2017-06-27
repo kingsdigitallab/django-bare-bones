@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # This is the bootstrap script for new projects.
-# 
+#
 # All variables used in this script are prefixed with BS_
 # for clarity, variables used elsewhere omit this prefix.
-# For example, inline settings in this script is 
-# BS_PH_SETTINGS_INLINE, and in other files it is 
+# For example, inline settings in this script is
+# BS_PH_SETTINGS_INLINE, and in other files it is
 # PH_SETTINGS_INLINE.
 
 # Partly for my own sanity
@@ -40,18 +40,33 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     which -s brew
     if [[ $? != 0 ]] ; then
         # Install Homebrew
-        echo "Installing Homebrew (this will only need to be done once)"
+        echo "- Installing Homebrew (this will only need to be done once)"
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
     fi
 
     # Check if Whiptail is installed
     if [ ! -f /usr/local/bin/whiptail ]; then
         # Install Whiptail
-        echo "Installing Whiptail (this will only need to be done once)"
+        echo "- Installing Whiptail (this will only need to be done once)"
         brew install newt;
     fi
 
     # Dependency Installation Finished
+fi
+
+# Autopep8 and Isort
+which -s autopep8
+if [[ $? != 0 ]] ; then
+    # Install Autopep8
+    echo "- Installing Autopep8"
+    sudo pip install autopep8
+fi
+
+which -s isort
+if [[ $? != 0 ]] ; then
+    # Install Isort
+    echo "- Installing Isort"
+    sudo pip install isort
 fi
 
 # Get project info
@@ -78,7 +93,7 @@ function func_digger {
     export BS_DIGGER_PROJECT_ID=$BS_DIGGER_PROJECT_ID
 }
 
-# LDAP 
+# LDAP
 function func_ldap {
     BS_LDAP_GROUP=$(whiptail --title "$TITLE" --inputbox "Enter the LDAP group for $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3)
     export BS_LDAP_GROUP=$BS_LDAP_GROUP
@@ -90,19 +105,21 @@ IFS=' ' read -r -a BS_PROJECT_OPTIONS <<< "$BS_SELECTIONS"
 
 
 # Build up our placeholder text...
+echo "- Collection required modules"
 for option in "${BS_PROJECT_OPTIONS[@]}"
 do
     # Installed apps, urls and middleware require indentation
-    BS_PH_SETTINGS_INLINE=$"$BS_PH_SETTINGS_INLINE\n$(cat .modules/$option/settings_inline)" 
-    BS_PH_SETTINGS_MODULES=$"$BS_PH_SETTINGS_MODULES\n$(cat .modules/$option/settings_modules)" 
-    BS_PH_INSTALLED_APPS=$"$BS_PH_INSTALLED_APPS\n$(cat .modules/$option/installed_apps)" 
-    BS_PH_URLS=$"$BS_PH_URLS\n$(cat .modules/$option/urls)" 
-    BS_PH_MIDDLEWARE=$"$BS_PH_MIDDLEWARE\n$(cat .modules/$option/middleware)" 
-    BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)" 
-    BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)" 
+    BS_PH_SETTINGS_INLINE=$"$BS_PH_SETTINGS_INLINE\n$(cat .modules/$option/settings_inline)"
+    BS_PH_SETTINGS_MODULES=$"$BS_PH_SETTINGS_MODULES\n$(cat .modules/$option/settings_modules)"
+    BS_PH_INSTALLED_APPS=$"$BS_PH_INSTALLED_APPS\n$(cat .modules/$option/installed_apps)"
+    BS_PH_URLS=$"$BS_PH_URLS\n$(cat .modules/$option/urls)"
+    BS_PH_MIDDLEWARE=$"$BS_PH_MIDDLEWARE\n$(cat .modules/$option/middleware)"
+    BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)"
+    BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)"
 done
 
 # Call option-specific functions
+echo "- Setting up selected applications"
 for option in "${BS_PROJECT_OPTIONS[@]}"
 do
     case $option in
@@ -117,6 +134,7 @@ do
 done
 
 # Take backup
+echo "- Backing up django bare bones"
 tar -zcf ../.django-bare-bones.tar.gz .
 
 export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
@@ -129,6 +147,7 @@ export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
 
 
 # Placeholders
+echo "- Adding settings to $BS_PROJECT_KEY"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$ENV{BS_PH_SETTINGS_INLINE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_MODULES:$ENV{BS_PH_SETTINGS_MODULES}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_INSTALLED_APPS:$ENV{BS_PH_INSTALLED_APPS}:g' {} \;
@@ -144,6 +163,7 @@ export BS_PROJECT_NAME=$BS_PROJECT_NAME
 
 
 # Generic Replacements
+echo "- Replacing project variables"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$ENV{BS_PROJECT_KEY}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_TITLE:$ENV{BS_PROJECT_NAME}:g' {} \;
 
@@ -152,17 +172,25 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$LDAP_GROUP:$ENV{BS_LDAP_GROUP}:g' {} \;
 
 # Fix newlines
+echo "- Fixing new lines"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
 
 
 # Tidy Up
+echo "- Tidying up"
 rm -rf .git
 rm -rf .modules
 
+echo "- Autopep8"
+find . -type f -name '*.py' -not -path './.*' -exec autopep8 --aggressive --in-place {} \;
+echo "- Sorting imports in Python files"
+find . -type f -name '*.py' -not -path './.*' -exec isort --atomic {} \;
+
+echo "- Setting up project directory and restoring django bare bones"
 mv project_name "$BS_PROJECT_KEY"
 cd ..
 mv django-bare-bones "$BS_PROJECT_KEY-django"
-mkdir django-bare-bones && cd django-bare-bones 
+mkdir django-bare-bones && cd django-bare-bones
 tar -zxf ../.django-bare-bones.tar.gz && rm ../.django-bare-bones.tar.gz
 rm -f "../$BS_PROJECT_KEY-django/bootstrap.sh"
 
