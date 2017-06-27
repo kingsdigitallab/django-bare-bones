@@ -64,8 +64,7 @@ INSTALLED_APPS = [
     'django_extensions'
 ]
 
-INSTALLED_APPS += [
-    # your project apps here
+INSTALLED_APPS += [    # your project apps here
     $PH_INSTALLED_APPS
 ]
 
@@ -256,5 +255,9 @@ FABRIC_USER = getpass.getuser()
 
 # Google Analytics ID
 GA_ID = ''
+
+# -----------------------------------------------------------------------------
+# Automatically generated settings
+# -----------------------------------------------------------------------------
 
 $PH_SETTINGS_INLINE
