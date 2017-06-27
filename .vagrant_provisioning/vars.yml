@@ -6,6 +6,6 @@ python: {requirements: requirements-dev.txt, virtualenv_location: /home/vagrant/
 system_packages: [ack-grep, zsh, vim-nox, python3-dev, python3-pip, python3-psycopg2,
   python3-setuptools, nfs-common, postgresql, postgresql-client, postgresql-server-dev-all,
   adminer, libldap2-dev, libsasl2-dev, libjpeg-dev, openjdk-8-jre, elasticsearch,
-  libxml2-dev, libxslt-dev, git, git-core, libssl-dev]
+  libxml2-dev, libxslt-dev, git, git-core, libssl-dev, open-vm-tools]
 user_home: /home/vagrant
 zsh: {oh_my_zsh: 'https://github.com/robbyrussell/oh-my-zsh.git', zshrc: zshrc}
