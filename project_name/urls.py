@@ -23,7 +23,6 @@ try:
             url(r'^__debug__/',
                 include(debug_toolbar.urls)),
         ]
-
 except ImportError:
     pass
 
