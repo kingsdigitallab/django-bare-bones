@@ -195,7 +195,7 @@ done <project_name/urls.py
 
 if [ -z ${BS_CATCH_ALL_URL+x} ]; then
     # No catch all URL, remove the placeholder
-    perl -pi -e 's:\$PH_CATCH_ALL_URL:"":g' project_name/urls.py
+    perl -pi -e 's:\$PH_CATCH_ALL_URL::g' project_name/urls.py
 else
     # Move the catch all url
     perl -pi -e 's:\$PH_CATCH_ALL_URL:$ENV{BS_CATCH_ALL_URL}:g' project_name/urls.py
