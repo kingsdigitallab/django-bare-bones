@@ -23,6 +23,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # ansible.tags = ""
     # ansible.verbose = "vvv"
   end
-
-  config.vm.synced_folder ".", "/vagrant", type: "nfs"
 end
