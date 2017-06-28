@@ -2,11 +2,7 @@
     "name": "$PROJECT_NAME",
     "version": "0.1",
     "dependencies": {
-        "jquery": null,
-        "foundation-sites": null,
-        "font-awesome": null,
-        "motion-ui": null,
-
+        "jquery": null
     },
     "main": "assets/js/main.js",
     "ignore": [
