@@ -20,6 +20,32 @@ BS_PH_MIDDLEWARE=""
 BS_PH_REQUIREMENTS=""
 BS_PH_URL_IMPORTS=""
 
+# Captures sigint/sigterm
+trap control_c SIGINT
+trap control_c SIGTERM
+
+function control_c {
+    killall whiptail # Just in case...
+    echo "#############################################"
+    echo "Quitting. This may leave django-bare-bones in"
+    echo "an inconsistent state."
+    echo "#############################################"
+    exit
+}
+
+# Checks if the cancel button was pressed in whiptail, and
+# if so, exits. Run this **directly** after calling 
+# whiptail.
+function whiptail_check_cancel {
+    exitcode=$?
+    if [ $exitcode = 1 ]; then
+        echo "#############################################"
+        echo "Quitting. This may leave django-bare-bones in"
+        echo "an inconsistent state."
+        echo "#############################################"
+        exit
+    fi
+}
 
 # Variable replacements:
 
@@ -37,10 +63,31 @@ TITLE="New KDL Project Setup"
 # Stop homebrew automatically updating itself...
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-# First of all, check if we're on OS X:
+# Check that vagrant is installed, and is the correct version.
+echo "- Checking Vagrant version"
+which vagrant > /dev/null
+if [[ $? != 0 ]] ; then
+    echo "#############################################"
+    echo "Vagrant not detected, please install Vagrant"
+    echo "from https://www.vagrantup.com"
+    echo "#############################################"
+    exit 1
+else
+    vagrant_version="$(vagrant --version | cut -d' ' -f2)"
+    if [ "$vagrant_version" \< "1.9.4" ] ; then 
+        echo "#############################################"
+        echo "Vagrant 1.9.4 or later is required, please"
+        echo "update Vagrant from https://www.vagrantup.com"
+        echo "#############################################"
+        exit 1
+    fi
+fi
+# OS-Specific Dependencies
+# OS X
 if [[ "$OSTYPE" == "darwin"* ]]; then
+
     # Check if Homebrew is installed
-    which brew
+    which brew > /dev/null
     if [[ $? != 0 ]] ; then
         # Install Homebrew
         echo "- Installing Homebrew (this will only need to be done once)"
@@ -48,24 +95,52 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     fi
 
     # Check if Whiptail is installed
-    if [ ! -f /usr/local/bin/whiptail ]; then
+    which whiptail > /dev/null
+    if [[ $? != 0 ]] ; then
         # Install Whiptail
         echo "- Installing Whiptail (this will only need to be done once)"
         brew install newt;
     fi
 
-    # Dependency Installation Finished
+    # Check if npm is installed
+    which npm > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Whiptail
+        echo "- Installing Node :(this will only need to be done once)"
+        brew install npm;
+    fi
+else    
+
+# Linux
+# Check if npm is installed
+    which npm > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Whiptail
+        echo "- Installing Node :(this will only need to be done once)"
+        sudo apt-get update
+        sudo apt-get -y install npm
+    fi
 fi
 
-# Autopep8 and Isort
-which autopep8
+# NodeJS Dependencies
+which bower > /dev/null
+if [[ $? != 0 ]] ; then
+    npm install -g bower
+fi
+
+# Ansible
+echo "- Checking for Ansible updates"
+sudo pip install --upgrade ansible
+
+# PIP Dependencies
+which autopep8 > /dev/null
 if [[ $? != 0 ]] ; then
     # Install Autopep8
     echo "- Installing Autopep8"
     sudo pip install autopep8
 fi
 
-which isort
+which isort > /dev/null
 if [[ $? != 0 ]] ; then
     # Install Isort
     echo "- Installing Isort"
@@ -74,7 +149,9 @@ fi
 
 # Get project info
 BS_PROJECT_KEY=$(whiptail --title "$TITLE" --inputbox "Choose a project key.\n\nThis should be the short project name which is used as the VM name." 10 40 3>&1 1>&2 2>&3)
+whiptail_check_cancel 
 BS_PROJECT_TITLE=$(whiptail --title "$TITLE" --inputbox "Choose a project title.\n\nThis is a slightly more verbose name, used as the project title." 10 40 3>&1 1>&2 2>&3)
+whiptail_check_cancel
 
 # Get project options
 BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 20 78 8 \
@@ -83,14 +160,16 @@ BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 
 "wagtail" "Use the Wagtail CMS" off \
 "wagtailsearch" "Use the Wagtail Search Engine (Requires Wagtail)" off \
 "haystack" "Use the Haystack Search Engine." off  3>&1 1>&2 2>&3)
-
+whiptail_check_cancel
 
 # Declare functions for options:
 
 # Digger
 function func_digger {
     BS_DIGGER_USER_ID=$(whiptail --title "$TITLE" --inputbox "Enter the Activecollab User ID to use for Digger in $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3);
+    whiptail_check_cancel
     BS_DIGGER_PROJECT_ID=$(whiptail --title "$TITLE" --inputbox "Enter the Activecollab Project ID to use for Digger in $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3);
+    whiptail_check_cancel
 
     export BS_DIGGER_USER_ID=$BS_DIGGER_USER_ID
     export BS_DIGGER_PROJECT_ID=$BS_DIGGER_PROJECT_ID
@@ -99,6 +178,7 @@ function func_digger {
 # LDAP
 function func_ldap {
     BS_LDAP_GROUP=$(whiptail --title "$TITLE" --inputbox "Enter the LDAP group for $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3)
+    whiptail_check_cancel
     export BS_LDAP_GROUP=$BS_LDAP_GROUP
 }
 
@@ -201,6 +281,9 @@ else
     perl -pi -e 's:\$PH_CATCH_ALL_URL:$ENV{BS_CATCH_ALL_URL}:g' project_name/urls.py
 fi
 
+# Run bower
+echo "- Running Bower"
+bower install
 
 # Tidy Up
 echo "- Tidying up"
@@ -219,7 +302,5 @@ mv django-bare-bones "$BS_PROJECT_KEY-django"
 mkdir django-bare-bones && cd django-bare-bones
 tar -zxf ../.django-bare-bones.tar.gz && rm ../.django-bare-bones.tar.gz
 rm -f "../$BS_PROJECT_KEY-django/bootstrap.sh"
-
-
 
 whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
