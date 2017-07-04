@@ -40,10 +40,12 @@ function control_c {
 function whiptail_check_cancel {
     exitcode=$?
     if [ $exitcode = 1 ]; then
+        echo
         echo "#############################################"
         echo "Quitting. This may leave django-bare-bones in"
         echo "an inconsistent state."
         echo "#############################################"
+        echo
         exit
     fi
 }
@@ -61,6 +63,9 @@ function whiptail_check_cancel {
 # Define our system variables
 TITLE="New KDL Project Setup"
 
+# Get current git branch of django-bare-bones
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
 # Stop homebrew automatically updating itself...
 export HOMEBREW_NO_AUTO_UPDATE=1
 
@@ -68,18 +73,22 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 echo "- Checking Vagrant version"
 which vagrant > /dev/null
 if [[ $? != 0 ]] ; then
+    echo
     echo "#############################################"
     echo "Vagrant not detected, please install Vagrant"
     echo "from https://www.vagrantup.com"
     echo "#############################################"
+    echo
     exit 1
 else
     vagrant_version="$(vagrant --version | cut -d' ' -f2)"
-    if [ "$vagrant_version" \< "1.9.4" ] ; then 
+    if [ "$vagrant_version" \< "1.9" ] ; then 
+        echo
         echo "#############################################"
-        echo "Vagrant 1.9.4 or later is required, please"
+        echo "Vagrant 1.9 or later is required, please"
         echo "update Vagrant from https://www.vagrantup.com"
         echo "#############################################"
+        echo
         exit 1
     fi
 fi
@@ -230,10 +239,6 @@ do
     esac
 done
 
-# Take backup
-echo "- Backing up django bare bones"
-tar -zcf ../.django-bare-bones.tar.gz .
-
 export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
 export BS_PH_SETTINGS_MODULES=$BS_PH_SETTINGS_MODULES
 export BS_PH_INSTALLED_APPS=$BS_PH_INSTALLED_APPS
@@ -315,8 +320,13 @@ echo "- Setting up project directory and restoring django bare bones"
 mv project_name "$BS_PROJECT_KEY"
 cd ..
 mv django-bare-bones "$BS_PROJECT_KEY-django"
-mkdir django-bare-bones && cd django-bare-bones
-tar -zxf ../.django-bare-bones.tar.gz && rm ../.django-bare-bones.tar.gz
+git clone https://github.com/kingsdigitallab/django-bare-bones.git django-bare-bones
+cd django-bare-bones
+git checkout "$GIT_BRANCH"
+
+
+# Remove ourself from the project
+echo "- Removing bootstrap"
 rm -f "../$BS_PROJECT_KEY-django/bootstrap.sh"
 
 whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
