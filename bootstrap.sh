@@ -165,9 +165,9 @@ whiptail_check_cancel
 
 # Get frontend framework choice
 BS_BOWER_FRAMEWORK=$(whiptail --title "$TITLE" --menu "Select UI Framework:" 20 78 8 \
-"none" "Don't install any UI Framework" \
 "bulma" "Bulma CSS: http://bulma.io" \
-"foundation-sites" "Foundation (Full): http://foundation.zurb.com"  3>&1 1>&2 2>&3)
+"foundation-sites" "Foundation (Full): http://foundation.zurb.com" \
+"none" "Don't install any UI Framework" 3>&1 1>&2 2>&3)
 whiptail_check_cancel
 
 # Declare functions for options:
