@@ -19,6 +19,8 @@ Shortcut: Use the following command to automatically clone and run the script:
 
 `git clone git@github.com:kingsdigitallab/django-bare-bones.git && cd django-bare-bones && ./bootstrap.sh`
 
+The default username/password for django is vagrant/vagrant.
+
 ## Requirements
 To use this script successfully you will need the following on the **host** machine:
 * Ansible >= 2.3.1.0
