@@ -276,6 +276,11 @@
     tags:
       - django
 
+  - name: django | add default (vagrant/vagrant) superuser
+    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py /manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    tags:
+      - django
+
 - hosts: all
   vars_files:
       - vars.yml
