@@ -19,6 +19,7 @@ BS_PH_URLS=""
 BS_PH_MIDDLEWARE=""
 BS_PH_REQUIREMENTS=""
 BS_PH_URL_IMPORTS=""
+BS_PH_BOWER_FRAMEWORK=""
 
 # Captures sigint/sigterm
 trap control_c SIGINT
@@ -162,6 +163,13 @@ BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 
 "haystack" "Use the Haystack Search Engine." off  3>&1 1>&2 2>&3)
 whiptail_check_cancel
 
+# Get frontend framework choice
+BS_BOWER_FRAMEWORK=$(whiptail --title "$TITLE" --menu "Select UI Framework:" 20 78 8 \
+"none" "Don't install any UI Framework" \
+"bulma" "Bulma CSS: http://bulma.io" \
+"foundation-sites" "Foundation (Full): http://foundation.zurb.com"  3>&1 1>&2 2>&3)
+whiptail_check_cancel
+
 # Declare functions for options:
 
 # Digger
@@ -188,7 +196,7 @@ IFS=' ' read -r -a BS_PROJECT_OPTIONS <<< "$BS_SELECTIONS"
 
 
 # Build up our placeholder text...
-echo "- Collection required modules"
+echo "- Collecting required modules"
 for option in "${BS_PROJECT_OPTIONS[@]}"
 do
     # Installed apps, urls and middleware require indentation
@@ -200,6 +208,12 @@ do
     BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)"
     BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)"
 done
+
+# Build bower placeholder
+echo "- Building bower requirements"
+if [[ "$BS_BOWER_FRAMEWORK" != "none" ]]; then
+    BS_PH_BOWER_FRAMEWORK="    \"$BS_BOWER_FRAMEWORK\": null,"
+fi
 
 # Call option-specific functions
 echo "- Setting up selected applications"
@@ -227,7 +241,7 @@ export BS_PH_URLS=$BS_PH_URLS
 export BS_PH_MIDDLEWARE=$BS_PH_MIDDLEWARE
 export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
 export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
-
+export BS_PH_BOWER_FRAMEWORK=$BS_PH_BOWER_FRAMEWORK
 
 # Placeholders
 echo "- Adding settings to $BS_PROJECT_KEY"
@@ -238,6 +252,8 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$ENV{BS_PH_MIDDLEWARE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URL_IMPORTS:$ENV{BS_PH_URL_IMPORTS}:g' {} \;
+perl -pi -e 's:\$PH_BOWER_FRAMEWORK:$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
+
 
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
 export BS_PROJECT_NAME=$BS_PROJECT_NAME
