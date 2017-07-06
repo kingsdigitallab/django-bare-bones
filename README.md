@@ -19,7 +19,8 @@ Pre-configured options include [LDAP Authentication](https://github.com/kingsdig
 5. Enter the new project directory `cd ../PROJECT_NAME-django`
 6. Edit local settings and configuration files as needed
 
-** Important **: If you wish to test your local working copy of django-bare-bones rather than cloning from git, pass the flag `-l` (`l` for **l**ocal) when calling bootstrap, e.g: `./bootstrap.sh -l`
+#### Local Modifications
+If you wish to test your local working copy of django-bare-bones rather than cloning from git, pass the flag `-l` when calling bootstrap, e.g: `./bootstrap.sh -l`. This will work on a copy of your local working copy of django-bare-bones, rather than cloning a new version from git.
 
 ## Requirements
 To use this script successfully you will need the following on the **host** machine:
