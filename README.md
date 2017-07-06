@@ -47,7 +47,7 @@ The default virtual machine is configured with:
 
 ## Known Issues:
 
-* Running `sudo systemctl reboot` will stop shared folders working. Use `vagrant reload` instead.
+* Ctrl-c does not work when a whiptail window is visible. Cancel button replicates this functionality
 
 
 ## Changelog
