@@ -278,6 +278,7 @@
 
   - name: django | add default (vagrant/vagrant) superuser
     command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    ignore_errors: yes
     tags:
       - django
 
