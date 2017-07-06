@@ -295,6 +295,7 @@
 
   - name: git | flake8 pre-commit hook
     command: "{{ user_home }}/venv/bin/flake8 --install-hook=git"
+    ignore_errors: yes # Stop errors if it already exists
     args:
       chdir: "{{ project_root }}"
   - command: "git config flake8.strict True"
