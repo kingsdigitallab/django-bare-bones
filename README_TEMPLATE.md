@@ -1,6 +1,6 @@
-# $PROJECT_KEY-django - $PROJECT_NAME
+# $PROJECT_NAME-django - $PROJECT_TITLE
 
-This is the repository for the django project $PROJECT_KEY.
+This is the repository for the django project $PROJECT_NAME.
 
 This project is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. 
 
