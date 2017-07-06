@@ -248,6 +248,15 @@ export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
 export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
 export BS_PH_BOWER_FRAMEWORK=$BS_PH_BOWER_FRAMEWORK
 
+# Here we go!
+# Clone a new bare-bones for this project (not copying
+# In case of local changes - that way it's clean)
+echo "- Downloading files. Using branch $GIT_BRANCH"
+cd ../
+git clone https://github.com/kingsdigitallab/django-bare-bones.git "$BS_PROJECT_KEY-django"
+cd "$BS_PROJECT_KEY-django"
+git checkout "$GIT_BRANCH"
+
 # Placeholders
 echo "- Adding settings to $BS_PROJECT_KEY"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$ENV{BS_PH_SETTINGS_INLINE}:g' {} \;
@@ -316,17 +325,12 @@ find . -type f -name '*.py' -not -path './.*' -exec autopep8 --aggressive --in-p
 echo "- Sorting imports in Python files"
 find . -type f -name '*.py' -not -path './.*' -exec isort --atomic {} \;
 
-echo "- Setting up project directory and restoring django bare bones"
+# Rename the project
+echo "- Setting project name"
 mv project_name "$BS_PROJECT_KEY"
-cd ..
-mv django-bare-bones "$BS_PROJECT_KEY-django"
-git clone https://github.com/kingsdigitallab/django-bare-bones.git django-bare-bones
-cd django-bare-bones
-git checkout "$GIT_BRANCH"
-
 
 # Remove ourself from the project
 echo "- Removing bootstrap"
-rm -f "../$BS_PROJECT_KEY-django/bootstrap.sh"
+rm -f bootstrap.sh
 
 whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
