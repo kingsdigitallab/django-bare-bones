@@ -11,7 +11,7 @@ Pre-configured options include [LDAP Authentication](https://github.com/kingsdig
 3. Run the bootstrap command and follow the prompts to set up the project: `./bootstrap.sh`
 4. The bootstrap script will then:
 	* Check your development environment, and install/update tools as necessary
-    * Clone a new copy of the repo into PROJECT_KEY-django
+    * Clone a new copy of the repo into PROJECT_KEY-django. It will use the same branch you are on now.
     * Populate settings, URLs and apps selected during the installation
     * Configure bower for the selected frontend framework and compile them into /assets/vendor
     * Remove all git configurations from the project, so that it can be added to a new repo
@@ -19,6 +19,7 @@ Pre-configured options include [LDAP Authentication](https://github.com/kingsdig
 5. Enter the new project directory `cd ../PROJECT_NAME-django`
 6. Edit local settings and configuration files as needed
 
+** Important **: If you wish to test your local working copy of django-bare-bones rather than cloning from git, pass the flag `-l` (`l` for **l**ocal) when calling bootstrap, e.g: `./bootstrap.sh -l`
 
 ## Requirements
 To use this script successfully you will need the following on the **host** machine:

@@ -275,13 +275,22 @@ export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
 export BS_PH_BOWER_FRAMEWORK=$BS_PH_BOWER_FRAMEWORK
 
 # Here we go!
-# Clone a new bare-bones for this project (not copying
-# In case of local changes - that way it's clean)
-echo "- Downloading files. Using branch $GIT_BRANCH"
 cd ../
-git clone https://github.com/kingsdigitallab/django-bare-bones.git "$BS_PROJECT_KEY-django"
-cd "$BS_PROJECT_KEY-django"
-git checkout "$GIT_BRANCH"
+
+# Check for the -l flag. If -l is given, we copy locally
+# rather than cloning fresh:
+if [ "$1" == "-l" ]; then
+    echo "- Copying local development environment we saw the flag -l"
+    cp -R django-bare-bones "$BS_PROJECT_KEY-django"
+    cd "$BS_PROJECT_KEY-django"
+else
+    # Clone a new bare-bones for this project (not copying
+    # In case of local changes - that way it's clean)
+    echo "- Downloading files. Using branch $GIT_BRANCH"
+    git clone https://github.com/kingsdigitallab/django-bare-bones.git "$BS_PROJECT_KEY-django"
+    cd "$BS_PROJECT_KEY-django"
+    git checkout "$GIT_BRANCH"
+fi
 
 # Placeholders
 echo "- Adding settings to $BS_PROJECT_KEY"
