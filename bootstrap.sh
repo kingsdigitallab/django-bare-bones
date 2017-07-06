@@ -10,6 +10,29 @@
 
 # Partly for my own sanity
 
+# Also note, this script can take these arguments:
+# --help : Prints help
+# --local : clones your local working copy rather than cloning from git
+# --nodepcheck : Skips the dependency checking
+# 
+# Important: --nodepcheck should be used for debugging only!
+
+# Check for help flag:
+if [[ "${@#--help}" != "$@" ]] ; then
+    echo
+    echo "This script creates a new django-based project, built around the KDL infrastructure. It uses Vagrant for provisioning and Fabric for deployment If run with no parameters, the script will check all dependencies and clone a new django-bare-bones instane from git."
+    echo 
+    echo "Bootstrap takes the following arguments:"
+    echo
+    echo "--help       : Displays this help message"
+    echo "--local      : Copies your local working copy instead of cloning from git"
+    echo "--nodepcheck : Disables dependency checking*"
+    echo
+    echo "* Use with extreme caution - this will cause the script to fail if a dependency is not installed. Never use for production-ready projects."
+    echo
+    exit
+fi
+
 # PLACEHOLDERS:
 
 BS_PH_SETTINGS_INLINE=""
@@ -28,10 +51,12 @@ trap control_c SIGTERM
 
 function control_c {
     killall whiptail > /dev/null # Just in case...
+    echo
     echo "#############################################"
     echo "Quitting. You may need to delete the project"
     echo "folder."
     echo "#############################################"
+    echo
     exit
 }
 
@@ -67,116 +92,130 @@ TITLE="New KDL Project Setup"
 # Get current git branch of django-bare-bones
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+
 # Stop homebrew automatically updating itself...
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-# Check that vagrant is installed, and is the correct version.
-echo "- Checking Vagrant version"
-if [[ $(which vagrant > /dev/null) ]] ; then
-    echo
-    echo "#############################################"
-    echo "Vagrant not detected, please install Vagrant"
-    echo "from https://www.vagrantup.com"
-    echo "#############################################"
-    echo
-    exit 1
+# Check for the --nodepcheck flag. If --nodepcheck is given, we assume
+# all dependencies are met. This may cause errors. Use with caution
+if [[ "${@#--nodepcheck}" != "$@" ]] ; then
+    echo "- WARNING: Running without dependency checks. This may cause errors."
+
 else
-    vagrant_version="$(vagrant --version | cut -d' ' -f2)"
-    if [ "$vagrant_version" \< "1.9" ] ; then 
+    # Check that vagrant is installed, and is the correct version.
+    echo "- Checking Vagrant version"
+    if [[ $(which vagrant > /dev/null) ]] ; then
         echo
         echo "#############################################"
-        echo "Vagrant 1.9 or later is required, please"
-        echo "update Vagrant from https://www.vagrantup.com"
+        echo "Vagrant not detected, please install Vagrant"
+        echo "from https://www.vagrantup.com"
         echo "#############################################"
         echo
         exit 1
+    else
+        vagrant_version="$(vagrant --version | cut -d' ' -f2)"
+        if [ "$vagrant_version" \< "1.9" ] ; then 
+            echo
+            echo "#############################################"
+            echo "Vagrant 1.9 or later is required, please"
+            echo "update Vagrant from https://www.vagrantup.com"
+            echo "#############################################"
+            echo
+            exit 1
+        fi
     fi
-fi
-# OS-Specific Dependencies
-# OS X
-if [[ "$OSTYPE" == "darwin"* ]]; then
+    # OS-Specific Dependencies
+    # OS X
+    if [[ "$OSTYPE" == "darwin"* ]]; then
 
-    # Check if Homebrew is installed
-    if [[ $(which brew > /dev/null) ]] ; then
-        # Install Homebrew
-        echo "- Installing Homebrew (this will only need to be done once)"
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-    fi
+        # Check if Homebrew is installed
+        if [[ $(which brew > /dev/null) ]] ; then
+            # Install Homebrew
+            echo "- Installing Homebrew (this will only need to be done once)"
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+        fi
 
-    # Check if Whiptail is installed
-    if [[ $(which whiptail > /dev/null) ]] ; then
-        # Install Whiptail
-        echo "- Installing Whiptail (this will only need to be done once)"
-        brew install newt;
-    fi
+        # Check if Whiptail is installed
+        if [[ $(which whiptail > /dev/null) ]] ; then
+            # Install Whiptail
+            echo "- Installing Whiptail (this will only need to be done once)"
+            brew install newt;
+        fi
 
+        # Check if npm is installed
+        if [[ $(which npm > /dev/null) ]] ; then
+            # Install Whiptail
+            echo "- Installing Node :(this will only need to be done once)"
+            brew install npm;
+        fi
+
+        # PIP Dependencies (Mac - no sudo)
+
+        # Ansible
+        echo "- Checking for Ansible updates"
+        pip install --upgrade ansible
+
+        if [[ $(which autopep8 > /dev/null) ]] ; then
+            # Install Autopep8
+            echo "- Installing Autopep8"
+            pip install autopep8
+        fi
+
+        if [[ $(which isort > /dev/null) ]] ; then
+            # Install Isort
+            echo "- Installing Isort"
+            pip install isort
+        fi
+
+    else    
+
+    # Linux
     # Check if npm is installed
-    if [[ $(which npm > /dev/null) ]] ; then
-        # Install Whiptail
-        echo "- Installing Node :(this will only need to be done once)"
-        brew install npm;
+        if [[ $(which npm > /dev/null) ]] ; then
+            # Install Whiptail
+            echo "- Installing Node :(this will only need to be done once)"
+            sudo apt-get update
+            sudo apt-get -y install npm
+        fi
+
+        # PIP Dependencies (with sudo)
+
+        # Ansible 
+        echo "- Checking for Ansible updates"
+        sudo pip install --upgrade ansible
+
+        if [[ $(which autopep8 > /dev/null) ]] ; then
+            # Install Autopep8
+            echo "- Installing Autopep8"
+            sudo pip install autopep8
+        fi
+
+        if [[ $(which isort > /dev/null) ]] ; then
+            # Install Isort
+            echo "- Installing Isort"
+            sudo pip install isort
+        fi
+
     fi
 
-    # PIP Dependencies (Mac - no sudo)
-
-    # Ansible
-    echo "- Checking for Ansible updates"
-    pip install --upgrade ansible
-
-    if [[ $(which autopep8 > /dev/null) ]] ; then
-        # Install Autopep8
-        echo "- Installing Autopep8"
-        pip install autopep8
+    # NodeJS Dependencies
+    if [[ $(which bower > /dev/null) ]] ; then
+        npm install -g bower
     fi
-
-    if [[ $(which isort > /dev/null) ]] ; then
-        # Install Isort
-        echo "- Installing Isort"
-        pip install isort
-    fi
-
-else    
-
-# Linux
-# Check if npm is installed
-    if [[ $(which npm > /dev/null) ]] ; then
-        # Install Whiptail
-        echo "- Installing Node :(this will only need to be done once)"
-        sudo apt-get update
-        sudo apt-get -y install npm
-    fi
-
-    # PIP Dependencies (with sudo)
-
-    # Ansible 
-    echo "- Checking for Ansible updates"
-    sudo pip install --upgrade ansible
-
-    if [[ $(which autopep8 > /dev/null) ]] ; then
-        # Install Autopep8
-        echo "- Installing Autopep8"
-        sudo pip install autopep8
-    fi
-
-    if [[ $(which isort > /dev/null) ]] ; then
-        # Install Isort
-        echo "- Installing Isort"
-        sudo pip install isort
-    fi
-
 fi
 
-# NodeJS Dependencies
-if [[ $(which bower > /dev/null) ]] ; then
-    npm install -g bower
-fi
+# Get project info (dont accept blank entries here!)
+BS_PROJECT_KEY=""
+while [[ $BS_PROJECT_KEY == "" ]] ; do
+    BS_PROJECT_KEY=$(whiptail --title "$TITLE" --inputbox "Choose a project key.\n\nThis should be the short project name which is used as the VM name." 10 40 3>&1 1>&2 2>&3)
+    whiptail_check_cancel 
+done
 
-
-# Get project info
-BS_PROJECT_KEY=$(whiptail --title "$TITLE" --inputbox "Choose a project key.\n\nThis should be the short project name which is used as the VM name." 10 40 3>&1 1>&2 2>&3)
-whiptail_check_cancel 
-BS_PROJECT_TITLE=$(whiptail --title "$TITLE" --inputbox "Choose a project title.\n\nThis is a slightly more verbose name, used as the project title." 10 40 3>&1 1>&2 2>&3)
-whiptail_check_cancel
+BS_PROJECT_TITLE=""
+while [[ $BS_PROJECT_TITLE == "" ]] ; do
+    BS_PROJECT_TITLE=$(whiptail --title "$TITLE" --inputbox "Choose a project title.\n\nThis is a slightly more verbose name, used as the project title." 10 40 3>&1 1>&2 2>&3)
+    whiptail_check_cancel
+done
 
 # Get project options
 BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 20 78 8 \
@@ -268,10 +307,10 @@ export BS_PH_BOWER_FRAMEWORK=$BS_PH_BOWER_FRAMEWORK
 # Here we go!
 cd ../
 
-# Check for the -l flag. If -l is given, we copy locally
+# Check for the --local flag. If --local is given, we copy locally
 # rather than cloning fresh:
-if [ "$1" == "-l" ]; then
-    echo "- Copying local development environment as we saw the flag -l"
+if [[ "${@#--local}" != "$@" ]] ; then
+    echo "- Copying local development environment as we saw --local"
     cp -R django-bare-bones "$BS_PROJECT_KEY-django"
     cd "$BS_PROJECT_KEY-django"
 else
@@ -362,4 +401,6 @@ mv project_name "$BS_PROJECT_KEY"
 echo "- Removing bootstrap"
 rm -f bootstrap.sh
 
+# Final notification
+echo "-$BS_PROJECT_KEY-django created!"
 whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
