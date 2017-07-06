@@ -10,7 +10,7 @@ This project is configured to use [Vagrant](https://www.vagrantup.com/) for loca
 3. SSH into the virtual machine: `vagrant ssh`
 4. Run the local development server: `./manage.py runserver 0:8000`
 
-You can then access the site locally at [http://localhost:8080](http://localhost:8080)
+You can then access the site locally at [http://localhost:8000](http://localhost:8000)
 
 If the project is ldap-enabled, you can login using your LDAP credentials. Note: LDAP authentication will only work within the college firewall. Alternatively, use the default superuser login:
 

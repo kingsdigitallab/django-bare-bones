@@ -20,6 +20,7 @@ BS_PH_MIDDLEWARE=""
 BS_PH_REQUIREMENTS=""
 BS_PH_URL_IMPORTS=""
 BS_PH_BOWER_FRAMEWORK=""
+BS_PH_CONTEXT_PROCESSORS=""
 
 # Captures sigint/sigterm
 trap control_c SIGINT
@@ -232,7 +233,8 @@ IFS=' ' read -r -a BS_PROJECT_OPTIONS <<< "$BS_SELECTIONS"
 echo "- Collecting required modules"
 for option in "${BS_PROJECT_OPTIONS[@]}"
 do
-    # Installed apps, urls and middleware require indentation
+    # Installed apps, urls, context_processors and middleware require indentation
+    BS_PH_CONTEXT_PROCESSORS=$"$BS_PH_CONTEXT_PROCESSORS\n$(cat .modules/$option/context_processors)"
     BS_PH_SETTINGS_INLINE=$"$BS_PH_SETTINGS_INLINE\n$(cat .modules/$option/settings_inline)"
     BS_PH_SETTINGS_MODULES=$"$BS_PH_SETTINGS_MODULES\n$(cat .modules/$option/settings_modules)"
     BS_PH_INSTALLED_APPS=$"$BS_PH_INSTALLED_APPS\n$(cat .modules/$option/installed_apps)"
@@ -263,6 +265,7 @@ do
     esac
 done
 
+export BS_PH_CONTEXT_PROCESSORS=$BS_PH_CONTEXT_PROCESSORS
 export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
 export BS_PH_SETTINGS_MODULES=$BS_PH_SETTINGS_MODULES
 export BS_PH_INSTALLED_APPS=$BS_PH_INSTALLED_APPS
@@ -292,6 +295,7 @@ fi
 
 # Placeholders
 echo "- Adding settings to $BS_PROJECT_KEY"
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_CONTEXT_PROCESSORS:$ENV{BS_PH_CONTEXT_PROCESSORS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_INLINE:$ENV{BS_PH_SETTINGS_INLINE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_SETTINGS_MODULES:$ENV{BS_PH_SETTINGS_MODULES}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_INSTALLED_APPS:$ENV{BS_PH_INSTALLED_APPS}:g' {} \;
