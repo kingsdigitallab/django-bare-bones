@@ -26,10 +26,10 @@ trap control_c SIGINT
 trap control_c SIGTERM
 
 function control_c {
-    killall whiptail # Just in case...
+    killall whiptail > /dev/null # Just in case...
     echo "#############################################"
-    echo "Quitting. This may leave django-bare-bones in"
-    echo "an inconsistent state."
+    echo "Quitting. You may need to delete the project"
+    echo "folder."
     echo "#############################################"
     exit
 }
@@ -42,8 +42,8 @@ function whiptail_check_cancel {
     if [ $exitcode = 1 ]; then
         echo
         echo "#############################################"
-        echo "Quitting. This may leave django-bare-bones in"
-        echo "an inconsistent state."
+        echo "Quitting. You may need to delete the project"
+        echo "folder."
         echo "#############################################"
         echo
         exit
@@ -139,8 +139,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         echo "- Installing Isort"
         pip install isort
     fi
-
-
 
 else    
 
@@ -280,7 +278,7 @@ cd ../
 # Check for the -l flag. If -l is given, we copy locally
 # rather than cloning fresh:
 if [ "$1" == "-l" ]; then
-    echo "- Copying local development environment we saw the flag -l"
+    echo "- Copying local development environment as we saw the flag -l"
     cp -R django-bare-bones "$BS_PROJECT_KEY-django"
     cd "$BS_PROJECT_KEY-django"
 else

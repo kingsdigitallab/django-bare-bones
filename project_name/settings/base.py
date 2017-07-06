@@ -47,6 +47,7 @@ CACHES = {
     }
 }
 
+
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 
@@ -166,6 +167,15 @@ TIME_ZONE = 'Europe/London'
 USE_I18N = True
 USE_L10N = False
 USE_TZ = True
+
+# -----------------------------------------------------------------------------
+# Dynamic login page based on wagtail installation 
+# -----------------------------------------------------------------------------
+
+if 'wagtail.wagtailcore' in INSTALLED_APPS:
+    LOGIN_URL = '/wagtail/login/'
+else:
+    LOGIN_URL = '/admin/login/'
 
 WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
 
