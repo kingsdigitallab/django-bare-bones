@@ -124,7 +124,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
     # Ansible
     echo "- Checking for Ansible updates"
-    sudo pip install --upgrade ansible
+    pip install --upgrade ansible
 
     which autopep8 > /dev/null
     if [[ $? != 0 ]] ; then
@@ -180,7 +180,7 @@ fi
 which bower > /dev/null
 if [[ $? != 0 ]] ; then
     npm install -g bower
-fi``
+fi
 
 
 # Get project info
@@ -345,6 +345,8 @@ bower install
 echo "- Tidying up"
 rm -rf .git
 rm -rf .modules
+rm README.md
+mv README_TEMPLATE.md README.md
 
 echo "- Autopep8"
 find . -type f -name '*.py' -not -path './.*' -exec autopep8 --aggressive --in-place {} \;
