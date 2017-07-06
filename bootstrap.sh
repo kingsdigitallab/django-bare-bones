@@ -119,6 +119,29 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         echo "- Installing Node :(this will only need to be done once)"
         brew install npm;
     fi
+
+    # PIP Dependencies (Mac - no sudo)
+
+    # Ansible
+    echo "- Checking for Ansible updates"
+    sudo pip install --upgrade ansible
+
+    which autopep8 > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Autopep8
+        echo "- Installing Autopep8"
+        pip install autopep8
+    fi
+
+    which isort > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Isort
+        echo "- Installing Isort"
+        pip install isort
+    fi
+
+
+
 else    
 
 # Linux
@@ -130,32 +153,35 @@ else
         sudo apt-get update
         sudo apt-get -y install npm
     fi
+
+    # PIP Dependencies (with sudo)
+
+    # Ansible 
+    echo "- Checking for Ansible updates"
+    sudo pip install --upgrade ansible
+
+    which autopep8 > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Autopep8
+        echo "- Installing Autopep8"
+        sudo pip install autopep8
+    fi
+
+    which isort > /dev/null
+    if [[ $? != 0 ]] ; then
+        # Install Isort
+        echo "- Installing Isort"
+        sudo pip install isort
+    fi
+
 fi
 
 # NodeJS Dependencies
 which bower > /dev/null
 if [[ $? != 0 ]] ; then
     npm install -g bower
-fi
+fi``
 
-# Ansible
-echo "- Checking for Ansible updates"
-sudo pip install --upgrade ansible
-
-# PIP Dependencies
-which autopep8 > /dev/null
-if [[ $? != 0 ]] ; then
-    # Install Autopep8
-    echo "- Installing Autopep8"
-    sudo pip install autopep8
-fi
-
-which isort > /dev/null
-if [[ $? != 0 ]] ; then
-    # Install Isort
-    echo "- Installing Isort"
-    sudo pip install isort
-fi
 
 # Get project info
 BS_PROJECT_KEY=$(whiptail --title "$TITLE" --inputbox "Choose a project key.\n\nThis should be the short project name which is used as the VM name." 10 40 3>&1 1>&2 2>&3)
