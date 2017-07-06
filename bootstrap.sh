@@ -72,8 +72,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 # Check that vagrant is installed, and is the correct version.
 echo "- Checking Vagrant version"
-which vagrant > /dev/null
-if [[ $? != 0 ]] ; then
+if [[ $(which vagrant > /dev/null) ]] ; then
     echo
     echo "#############################################"
     echo "Vagrant not detected, please install Vagrant"
@@ -98,24 +97,21 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
 
     # Check if Homebrew is installed
-    which brew > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which brew > /dev/null) ]] ; then
         # Install Homebrew
         echo "- Installing Homebrew (this will only need to be done once)"
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
     fi
 
     # Check if Whiptail is installed
-    which whiptail > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which whiptail > /dev/null) ]] ; then
         # Install Whiptail
         echo "- Installing Whiptail (this will only need to be done once)"
         brew install newt;
     fi
 
     # Check if npm is installed
-    which npm > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which npm > /dev/null) ]] ; then
         # Install Whiptail
         echo "- Installing Node :(this will only need to be done once)"
         brew install npm;
@@ -127,15 +123,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "- Checking for Ansible updates"
     pip install --upgrade ansible
 
-    which autopep8 > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which autopep8 > /dev/null) ]] ; then
         # Install Autopep8
         echo "- Installing Autopep8"
         pip install autopep8
     fi
 
-    which isort > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which isort > /dev/null) ]] ; then
         # Install Isort
         echo "- Installing Isort"
         pip install isort
@@ -145,8 +139,7 @@ else
 
 # Linux
 # Check if npm is installed
-    which npm > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which npm > /dev/null) ]] ; then
         # Install Whiptail
         echo "- Installing Node :(this will only need to be done once)"
         sudo apt-get update
@@ -159,15 +152,13 @@ else
     echo "- Checking for Ansible updates"
     sudo pip install --upgrade ansible
 
-    which autopep8 > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which autopep8 > /dev/null) ]] ; then
         # Install Autopep8
         echo "- Installing Autopep8"
         sudo pip install autopep8
     fi
 
-    which isort > /dev/null
-    if [[ $? != 0 ]] ; then
+    if [[ $(which isort > /dev/null) ]] ; then
         # Install Isort
         echo "- Installing Isort"
         sudo pip install isort
@@ -176,8 +167,7 @@ else
 fi
 
 # NodeJS Dependencies
-which bower > /dev/null
-if [[ $? != 0 ]] ; then
+if [[ $(which bower > /dev/null) ]] ; then
     npm install -g bower
 fi
 
