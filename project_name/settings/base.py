@@ -125,7 +125,7 @@ LOGGING = {
     }
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -135,7 +135,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     $PH_MIDDLEWARE
-)
+]
 
 ROOT_URLCONF = PROJECT_NAME + '.urls'
 
