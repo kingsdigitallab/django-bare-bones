@@ -5,7 +5,7 @@ This is the repository for the $PROJECT_NAME project at [https://kdl.kcl.ac.uk](
 This project is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. 
 
 ## Getting started
-1. Enter the project directory: `cd $BS_PROJECT_KEY-django`
+1. Enter the project directory: `cd $PROJECT_NAME-django`
 2. Start the virtual machine: `vagrant up`
 3. SSH into the virtual machine: `vagrant ssh`
 4. Run the local development server: `./manage.py runserver 0:8000`
