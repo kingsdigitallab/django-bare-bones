@@ -235,6 +235,13 @@
       - db
       - data
 
+  - name: posgresql | create postgis extension if available
+    become_user: "{{ postgresql.admin_user }}"
+    command: psql -U {{ postgresql.admin_user }} -d {{ app.name }} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+    tags:
+      - db
+      - data
+
   handlers:
   - name: postgresql | apply privileges
     become_user: "{{ postgresql.admin_user }}"
@@ -278,7 +285,7 @@
 
   - name: django | add default (vagrant/vagrant) superuser
     command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
-    ignore_errors: yes
+    ignore_errors: yes # The user may already exist
     tags:
       - django
 

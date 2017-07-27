@@ -2,9 +2,14 @@ from .base import *  # noqa
 
 DEBUG = True
 
+# Check which db engine to use:
+db_engine = 'django.db.backends.postgresql_psycopg2'
+if 'django.contrib.gis' in INSTALLED_APPS:
+    db_engine = 'django.contrib.gis.db.backends.postgis'
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': db_engine,
         'NAME': '$PROJECT_NAME',
         'USER': '$PROJECT_NAME',
         'PASSWORD': '$PROJECT_NAME',
