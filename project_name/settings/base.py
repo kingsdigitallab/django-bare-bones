@@ -157,7 +157,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 $PH_CONTEXT_PROCESSORS
             ],
-            'debug': False,
         },
     },
 ]
