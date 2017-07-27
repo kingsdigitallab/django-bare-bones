@@ -13,3 +13,4 @@
     'wagtail.contrib.wagtailroutablepage',
     'wagtail.contrib.table_block',
     'taggit',
+    'modelcluster',

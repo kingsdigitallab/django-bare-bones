@@ -50,7 +50,7 @@ trap control_c SIGINT
 trap control_c SIGTERM
 
 function control_c {
-    killall whiptail > /dev/null # Just in case...
+    killall whiptail # Just in case...
     echo
     echo "#############################################"
     echo "Quitting. You may need to delete the project"
@@ -100,11 +100,10 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 # all dependencies are met. This may cause errors. Use with caution
 if [[ "${@#--nodepcheck}" != "$@" ]] ; then
     echo "- WARNING: Running without dependency checks. This may cause errors."
-
 else
     # Check that vagrant is installed, and is the correct version.
     echo "- Checking Vagrant version"
-    if [[ $(which vagrant > /dev/null) ]] ; then
+    if ! [[ $(which vagrant) ]] ; then
         echo
         echo "#############################################"
         echo "Vagrant not detected, please install Vagrant"
@@ -129,77 +128,55 @@ else
     if [[ "$OSTYPE" == "darwin"* ]]; then
 
         # Check if Homebrew is installed
-        if [[ $(which brew > /dev/null) ]] ; then
+        if ! [[ $(which brew) ]] ; then
             # Install Homebrew
             echo "- Installing Homebrew (this will only need to be done once)"
             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
         fi
 
         # Check if Whiptail is installed
-        if [[ $(which whiptail > /dev/null) ]] ; then
+        if ! [[ $(which whiptail) ]] ; then
             # Install Whiptail
             echo "- Installing Whiptail (this will only need to be done once)"
             brew install newt;
         fi
 
         # Check if npm is installed
-        if [[ $(which npm > /dev/null) ]] ; then
+        if ! [[ $(which npm) ]] ; then
             # Install Whiptail
             echo "- Installing Node :(this will only need to be done once)"
             brew install npm;
         fi
-
-        # PIP Dependencies (Mac - no sudo)
-
-        # Ansible
-        echo "- Checking for Ansible updates"
-        pip install --upgrade ansible
-
-        if [[ $(which autopep8 > /dev/null) ]] ; then
-            # Install Autopep8
-            echo "- Installing Autopep8"
-            pip install autopep8
-        fi
-
-        if [[ $(which isort > /dev/null) ]] ; then
-            # Install Isort
-            echo "- Installing Isort"
-            pip install isort
-        fi
-
     else    
 
     # Linux
     # Check if npm is installed
-        if [[ $(which npm > /dev/null) ]] ; then
+        if ! [[ $(which npm) ]] ; then
             # Install Whiptail
             echo "- Installing Node :(this will only need to be done once)"
             sudo apt-get update
             sudo apt-get -y install npm
         fi
+    fi
 
-        # PIP Dependencies (with sudo)
+    # Ansible 
+    echo "- Checking for Ansible updates"
+    pip install --user --upgrade ansible
 
-        # Ansible 
-        echo "- Checking for Ansible updates"
-        sudo pip install --upgrade ansible
+    if ! [[ $(which autopep8) ]] ; then
+        # Install Autopep8
+        echo "- Installing Autopep8"
+        pip install --user autopep8
+    fi
 
-        if [[ $(which autopep8 > /dev/null) ]] ; then
-            # Install Autopep8
-            echo "- Installing Autopep8"
-            sudo pip install autopep8
-        fi
-
-        if [[ $(which isort > /dev/null) ]] ; then
-            # Install Isort
-            echo "- Installing Isort"
-            sudo pip install isort
-        fi
-
+    if ! [[ $(which isort) ]] ; then
+        # Install Isort
+        echo "- Installing Isort"
+        pip install --user isort
     fi
 
     # NodeJS Dependencies
-    if [[ $(which bower > /dev/null) ]] ; then
+    if ! [[ $(which bower) ]] ; then
         npm install -g bower
     fi
 fi
@@ -220,6 +197,7 @@ done
 # Get project options
 BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 20 78 8 \
 "digger" "Enable the ActiveCollab Digger (Requires AC UID)" off \
+"geodjango" "Enable geodjango and GIS" off \
 "ldap" "Authenticate with the KDL LDAP server" on \
 "wagtail" "Use the Wagtail CMS" off \
 "wagtailsearch" "Use the Wagtail Search Engine (Requires Wagtail)" off \
