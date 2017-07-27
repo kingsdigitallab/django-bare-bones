@@ -27,6 +27,9 @@ PROJECT_NAME = '$PROJECT_NAME'
 # Git repository pointer
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
+
+
+env.gateway = 'ssh.kdl.kcl.ac.uk'
 # Host names used as deployment targets
 env.hosts = ['{}.kdl.kcl.ac.uk'.format(PROJECT_NAME)]
 # Absolute filesystem path to project 'webroot'
