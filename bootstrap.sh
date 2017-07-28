@@ -381,4 +381,4 @@ rm -f bootstrap.sh
 
 # Final notification
 echo "-$BS_PROJECT_KEY-django created!"
-whiptail --title "$TITLE" --msgbox "Configuration complete. Please remember to add any required local settings." 20 70 0
+whiptail --title "$TITLE" --msgbox "Configuration complete. You can now provision your Vagrant VM, $BS_PROJECT_KEY-django" 20 70 0

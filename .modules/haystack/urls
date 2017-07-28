@@ -1,1 +1,1 @@
-    (r'^search/', include('haystack.urls')),
+    url(r'^search/', include('haystack.urls')),
