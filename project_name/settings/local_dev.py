@@ -1,12 +1,15 @@
 from .base import *  # noqa
 
+CACHE_REDIS_DATABASE = '2'
+CACHES['default']['LOCATION'] = '127.0.0.1:6379:' + CACHE_REDIS_DATABASE
+
 DEBUG = True
 
-INTERNAL_IPS = INTERNAL_IPS + ('', )
+INTERNAL_IPS = INTERNAL_IPS + ['']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': db_engine,
         'NAME': 'app_$PROJECT_NAME_dev',
         'USER': 'app_$PROJECT_NAME',
         'PASSWORD': '',
@@ -17,8 +20,6 @@ DATABASES = {
 LOGGING_LEVEL = logging.DEBUG
 
 LOGGING['loggers']['$PROJECT_NAME']['level'] = LOGGING_LEVEL
-
-TEMPLATES[0]['OPTIONS']['debug'] = True
 
 # -----------------------------------------------------------------------------
 # Django Extensions

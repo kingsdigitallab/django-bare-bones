@@ -49,10 +49,24 @@ CACHES = {
 
 
 CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+
+# -----------------------------------------------------------------------------
+# EMAIL SETTINGS
+# -----------------------------------------------------------------------------
+
+DEFAULT_FROM_EMAIL = 'noreply@kcl.ac.uk'
+EMAIL_HOST = 'smtp.kcl.ac.uk'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[Django {}] '.format(PROJECT_NAME)
+EMAIL_USE_TLS = False
+
+# Sender of error messages to ADMINS and MANAGERS
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 INSTALLED_APPS = [
     'grappelli',
@@ -70,7 +84,14 @@ INSTALLED_APPS += [    # your project apps here
     $PH_INSTALLED_APPS
 ]
 
-INTERNAL_IPS = ('127.0.0.1', )
+INTERNAL_IPS = ['127.0.0.1']
+
+# https://docs.djangoproject.com/en/dev/topics/i18n/
+LANGUAGE_CODE = 'en-gb'
+TIME_ZONE = 'Europe/London'
+USE_I18N = True
+USE_L10N = False
+USE_TZ = True
 
 LOGGING_ROOT = os.path.join(BASE_DIR, 'logs')
 LOGGING_LEVEL = logging.WARN
@@ -162,15 +183,11 @@ TEMPLATES = [
     },
 ]
 
-# https://docs.djangoproject.com/en/dev/topics/i18n/
-LANGUAGE_CODE = 'en-gb'
-TIME_ZONE = 'Europe/London'
-USE_I18N = True
-USE_L10N = False
-USE_TZ = True
+WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
 
 # -----------------------------------------------------------------------------
-# Dynamic login page based on wagtail installation 
+# Authentication
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth
 # -----------------------------------------------------------------------------
 
 if 'wagtail.wagtailcore' in INSTALLED_APPS:
@@ -178,7 +195,12 @@ if 'wagtail.wagtailcore' in INSTALLED_APPS:
 else:
     LOGIN_URL = '/admin/login/'
 
-WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
+# -----------------------------------------------------------------------------
+# Sessions
+# https://docs.djangoproject.com/en/dev/ref/settings/#sessions
+# -----------------------------------------------------------------------------
+
+SESSION_COOKIE_SECURE = True
 
 # -----------------------------------------------------------------------------
 # Static files (CSS, JavaScript, Images)
@@ -205,27 +227,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL.strip('/'))
 
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
-
-# -----------------------------------------------------------------------------
-# EMAIL SETTINGS
-# -----------------------------------------------------------------------------
-
-EMAIL_HOST = 'smtp.kcl.ac.uk'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'noreply@kcl.ac.uk'
-# Sender of error messages to ADMINS and MANAGERS
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
-EMAIL_SUBJECT_PREFIX = '[Django {}] '.format(PROJECT_NAME)
-
-# -----------------------------------------------------------------------------
-# Sessions
-# https://docs.djangoproject.com/en/1.8/ref/settings/#sessions
-# -----------------------------------------------------------------------------
-
-SESSION_COOKIE_SECURE = True
 
 # -----------------------------------------------------------------------------
 # Installed Applications Settings
@@ -270,5 +271,10 @@ GA_ID = ''
 # -----------------------------------------------------------------------------
 # Automatically generated settings
 # -----------------------------------------------------------------------------
+
+# Check which db engine to use:
+db_engine = 'django.db.backends.postgresql_psycopg2'
+if 'django.contrib.gis' in INSTALLED_APPS:
+    db_engine = 'django.contrib.gis.db.backends.postgis'
 
 $PH_SETTINGS_INLINE

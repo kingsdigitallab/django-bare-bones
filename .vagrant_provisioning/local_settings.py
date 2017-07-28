@@ -2,10 +2,8 @@ from .base import *  # noqa
 
 DEBUG = True
 
-# Check which db engine to use:
-db_engine = 'django.db.backends.postgresql_psycopg2'
-if 'django.contrib.gis' in INSTALLED_APPS:
-    db_engine = 'django.contrib.gis.db.backends.postgis'
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 DATABASES = {
     'default': {
@@ -18,15 +16,11 @@ DATABASES = {
     },
 }
 
-INTERNAL_IPS = ('0.0.0.0', '127.0.0.1', '::1')
+INTERNAL_IPS = ['0.0.0.0', '127.0.0.1', '::1']
 
 SECRET_KEY = '12345'
 
 FABRIC_USER = ''
-
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SECURE = False
 
 # -----------------------------------------------------------------------------
 # Django Debug Toolbar
