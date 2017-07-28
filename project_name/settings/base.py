@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_extensions'
+    'django_extensions',
+    'compressor',
 ]
 
 INSTALLED_APPS += [    # your project apps here
@@ -157,7 +158,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 $PH_CONTEXT_PROCESSORS
             ],
-            'debug': False,
         },
     },
 ]

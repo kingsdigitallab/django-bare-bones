@@ -37,13 +37,13 @@
   {% compress js %}
   <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
 
-  <script src="{% static 'assets/js/main.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
   {% endcompress %}
 
   {% block footer_scripts %}{% endblock %}
 
   {% compress js %}
-  <script src="{% static 'assets/js/google_analytics.js' %}"></script>
+  <script src="{% static 'js/google_analytics.js' %}"></script>
   <script>
     ga('create', '{{ GA_ID }}', 'auto');
     ga('send', 'pageview');
