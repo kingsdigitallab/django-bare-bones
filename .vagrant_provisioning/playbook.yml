@@ -68,6 +68,24 @@
     user: name=vagrant shell=/bin/zsh
     tags:
       - system
+  
+  - name: motd | clean existing
+    become: yes
+    shell: 'rm -rf /etc/update-motd.d/*'
+    tags:
+      - system
+
+  - name: motd | deploy motd
+    become: yes
+    copy: src={{ motd.file }} dest=/etc/update-motd.d/00-kdl owner=root
+    tags:
+      - system
+
+  - name: motd | permissions
+    become: yes
+    shell: 'chmod +x /etc/update-motd.d/*'
+    tags:
+      - system
 
 - hosts: all
   vars_files:

@@ -24,7 +24,7 @@ Bootstrap.sh accepts the following arguments:
 
 * `--help`: Displays help text
 * `--local`: Copies your local working copy of django-bare-bones rather than cloning from git. 
-* `--nodepcheck`: Disables dependency checking. Use with extreme caution - this will cause the script to fail if a dependency is not installed. Never use for production-ready projects.
+* `--no-dep-check`: Disables dependency checking. Use with extreme caution - this will cause the script to fail if a dependency is not installed. Never use for production-ready projects.
 
 ## Requirements
 To use this script successfully you will need the following on the **host** machine:

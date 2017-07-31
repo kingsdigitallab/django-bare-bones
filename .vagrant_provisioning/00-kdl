@@ -1,0 +1,35 @@
+#!/bin/sh
+
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+
+if [ -z "$DISTRIB_DESCRIPTION" ] && [ -x /usr/bin/lsb_release ]; then
+    # Fall back to using the very slow lsb_release utility
+    DISTRIB_DESCRIPTION=$(lsb_release -s -d)
+fi
+
+echo # blank line
+
+
+echo "Welcome to the KDL Vagrant Virtual Environment for $PROJECT_NAME!"
+
+echo # blank line
+
+echo "OS:		Ubuntu" # OS info
+lsb_release -r
+
+echo # blank line
+
+echo "Please report issues here: https://app.activecollab.com/148987/projects/816" # Activecollab
+
+echo # blank line
+
+git fetch origin && git status;
+
+echo # blank line
+
+echo "#######################"
+echo "Default django login:"
+echo "Username: vagrant"
+echo "Password: vagrant"
+echo "#######################"
+echo

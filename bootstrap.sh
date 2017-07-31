@@ -13,9 +13,9 @@
 # Also note, this script can take these arguments:
 # --help : Prints help
 # --local : clones your local working copy rather than cloning from git
-# --nodepcheck : Skips the dependency checking
+# --no-dep-check : Skips the dependency checking
 # 
-# Important: --nodepcheck should be used for debugging only!
+# Important: --no-dep-check should be used for debugging only!
 
 # Check for help flag:
 if [[ "${@#--help}" != "$@" ]] ; then
@@ -24,9 +24,9 @@ if [[ "${@#--help}" != "$@" ]] ; then
     echo 
     echo "Bootstrap takes the following arguments:"
     echo
-    echo "--help       : Displays this help message"
-    echo "--local      : Copies your local working copy instead of cloning from git"
-    echo "--nodepcheck : Disables dependency checking*"
+    echo "--help         : Displays this help message"
+    echo "--local        : Copies your local working copy instead of cloning from git"
+    echo "--no-dep-check : Disables dependency checking*"
     echo
     echo "* Use with extreme caution - this will cause the script to fail if a dependency is not installed. Never use for production-ready projects."
     echo
@@ -96,9 +96,9 @@ GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # Stop homebrew automatically updating itself...
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-# Check for the --nodepcheck flag. If --nodepcheck is given, we assume
+# Check for the --no-dep-check flag. If --no-dep-check is given, we assume
 # all dependencies are met. This may cause errors. Use with caution
-if [[ "${@#--nodepcheck}" != "$@" ]] ; then
+if [[ "${@#--no-dep-check}" != "$@" ]] ; then
     echo "- WARNING: Running without dependency checks. This may cause errors."
 else
     # Check that vagrant is installed, and is the correct version.
