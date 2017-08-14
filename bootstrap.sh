@@ -314,13 +314,13 @@ perl -pi -e 's:\$PH_BOWER_FRAMEWORK:$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
 
 
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
-export BS_PROJECT_NAME=$BS_PROJECT_NAME
+export BS_PROJECT_TITLE=$BS_PROJECT_TITLE
 
 
 # Generic Replacements
 echo "- Replacing project variables"
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_NAME:$ENV{BS_PROJECT_KEY}:g' {} \;
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_TITLE:$ENV{BS_PROJECT_NAME}:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PROJECT_TITLE:$ENV{BS_PROJECT_TITLE}:g' {} \;
 
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_USER_ID:$ENV{BS_DIGGER_USER_ID}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$DIGGER_PROJECT_ID:$ENV{BS_DIGGER_PROJECT_ID}:g' {} \;
