@@ -23,10 +23,6 @@ echo "Please report issues here: https://app.activecollab.com/148987/projects/81
 
 echo # blank line
 
-git fetch origin && git status;
-
-echo # blank line
-
 echo "#######################"
 echo "Default django login:"
 echo "Username: vagrant"
