@@ -1,3 +1,4 @@
+ansible_python_interpreter: /usr/bin/python3
 app: {name: $PROJECT_NAME}
 motd: {file: 00-kdl}
 postgresql: {admin_user: postgres, cluster_name: main, cluster_reset: false, default_auth_method: trust,
