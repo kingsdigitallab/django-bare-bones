@@ -6,8 +6,9 @@ import sys
 from functools import wraps
 
 from django.conf import settings as django_settings
-from fabric.api import (cd, env, prefix, put, quiet, require, run, settings,
-                        sudo, task)
+from django.core.management.utils import get_random_secret_key
+from fabric.api import (cd, env, prefix, prompt, put, quiet, require, run,
+                        settings, sudo, task)
 from fabric.colors import green, yellow
 from fabric.contrib import django
 
@@ -207,8 +208,23 @@ def upload_local_settings():
     with cd(env.path):
         with settings(warn_only=True):
             if run('ls {}/settings/local.py'.format(PROJECT_NAME)).failed:
+                db_host = prompt('Database host: ')
+                db_pwd = prompt('Database password: ')
+
                 put('{}/settings/local_{}.py'.format(PROJECT_NAME, env.srvr),
                     '{}/settings/local.py'.format(PROJECT_NAME), mode='0664')
+
+                run('echo >> {}/settings/local.py'.format(PROJECT_NAME))
+                run('echo '
+                    '"DATABASES[\'default\'][\'PASSWORD\'] = \'{}\'" >>'
+                    '{}/settings/local.py'.format(db_pwd, PROJECT_NAME))
+                run('echo '
+                    '"DATABASES[\'default\'][\'HOST\'] = \'{}\'" >>'
+                    '{}/settings/local.py'.format(db_host, PROJECT_NAME))
+                run('echo '
+                    '"SECRET_KEY = \'{}\'" >>'
+                    '{}/settings/local.py'.format(
+                        get_random_secret_key(), PROJECT_NAME))
 
 
 @task
