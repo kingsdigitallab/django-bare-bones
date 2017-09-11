@@ -12,3 +12,5 @@ DATABASES = {
         'HOST': ''
     },
 }
+
+SECRET_KEY = ''
