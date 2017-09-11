@@ -155,9 +155,7 @@ def install_requirements():
         reqs = 'requirements.txt'
 
     with cd(env.path), prefix(env.within_virtualenv):
-        # GN: | cat to prevent shard-shaped progress bar polluting the output
-        # Until --no-progress-bar option appears in new pip version
-        run('pip install -q --no-cache -U -r {} | cat'.format(reqs))
+        run('pip install -q --no-cache -U -r {}'.format(reqs))
 
 
 @task
