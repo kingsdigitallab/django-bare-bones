@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-from fabric.api import cd, env, prefix, quiet, require, run, sudo, task
+import os.path
+import sys
+from functools import wraps
+
+from django.conf import settings as django_settings
+from fabric.api import (cd, env, prefix, put, quiet, require, run, settings,
+                        sudo, task)
 from fabric.colors import green, yellow
 from fabric.contrib import django
-from functools import wraps
-import sys
-import os.path
-
 
 # put project directory in path
 project_root = os.path.abspath(os.path.dirname(__file__))
@@ -44,13 +45,13 @@ django.project(PROJECT_NAME)
 
 # Set FABRIC_GATEWAY = 'username@proxy.x' in local.py
 # if you are behind a proxy.
-FABRIC_GATEWAY = getattr(settings, 'FABRIC_GATEWAY', None)
+FABRIC_GATEWAY = getattr(django_settings, 'FABRIC_GATEWAY', None)
 if FABRIC_GATEWAY:
     env.forward_agent = True
     env.gateway = FABRIC_GATEWAY
 
 # Name of linux user who deploys on the remote server
-env.user = settings.FABRIC_USER
+env.user = django_settings.FABRIC_USER
 
 
 def server(func):
@@ -170,6 +171,7 @@ def reinstall_requirement(which):
 def deploy(version=None):
     update(version)
     install_requirements()
+    upload_local_settings()
     own_django_log()
     fix_permissions()
     migrate()
@@ -196,6 +198,17 @@ def update(version=None):
     with cd(env.path), prefix(env.within_virtualenv):
         run('git pull')
         run('git checkout {}'.format(to_version))
+
+
+@task
+def upload_local_settings():
+    require('srvr', 'path', provided_by=env.servers)
+
+    with cd(env.path):
+        with settings(warn_only=True):
+            if run('ls {}/settings/local.py'.format(PROJECT_NAME)).failed:
+                put('{}/settings/local_{}.py'.format(PROJECT_NAME, env.srvr),
+                    '{}/settings/local.py'.format(PROJECT_NAME), mode='0664')
 
 
 @task
