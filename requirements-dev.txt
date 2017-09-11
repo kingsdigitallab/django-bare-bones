@@ -1,6 +1,6 @@
 -r requirements.txt
 django-debug-toolbar
-Fabric
+Fabric3
 flake8
 ipython
 tox
