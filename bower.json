@@ -2,8 +2,8 @@
     "name": "$PROJECT_NAME",
     "version": "0.1",
     "dependencies": {
-        $PH_BOWER_FRAMEWORK
         "jquery": null
+        $PH_BOWER_FRAMEWORK
     },
     "main": "assets/js/main.js",
     "ignore": [
