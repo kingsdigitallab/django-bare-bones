@@ -161,18 +161,18 @@ else
 
     # Ansible 
     echo "- Checking for Ansible updates"
-    pip install --user --upgrade ansible
+    pip3 install --user --upgrade ansible
 
     if ! [[ $(which autopep8) ]] ; then
         # Install Autopep8
         echo "- Installing Autopep8"
-        pip install --user autopep8
+        pip3 install --user autopep8
     fi
 
     if ! [[ $(which isort) ]] ; then
         # Install Isort
         echo "- Installing Isort"
-        pip install --user isort
+        pip3 install --user isort
     fi
 
     # NodeJS Dependencies
@@ -254,7 +254,7 @@ done
 # Build bower placeholder
 echo "- Building bower requirements"
 if [[ "$BS_BOWER_FRAMEWORK" != "none" ]]; then
-    BS_PH_BOWER_FRAMEWORK="    \"$BS_BOWER_FRAMEWORK\": null,"
+    BS_PH_BOWER_FRAMEWORK="    \"$BS_BOWER_FRAMEWORK\": null"
 fi
 
 # Call option-specific functions
