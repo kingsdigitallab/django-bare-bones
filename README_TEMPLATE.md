@@ -1,6 +1,6 @@
 # $PROJECT_NAME-django
 
-This is the repository for the $PROJECT_NAME project at [https://kdl.kcl.ac.uk](King's Digital Lab)
+This is the repository for the $PROJECT_NAME project at [Kings Digital Lab](https://kdl.kcl.ac.uk)
 
 This project is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. 
 
