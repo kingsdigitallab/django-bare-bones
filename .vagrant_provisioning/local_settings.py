@@ -38,5 +38,6 @@ try:
 except ImportError:
     pass
 
+LOGGING['loggers']['$PROJECT_NAME'] = {}
 LOGGING['loggers']['$PROJECT_NAME']['handlers'] = ['console']
 LOGGING['loggers']['$PROJECT_NAME']['level'] = logging.DEBUG
