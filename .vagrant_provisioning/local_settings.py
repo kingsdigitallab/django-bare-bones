@@ -37,3 +37,6 @@ try:
     DEBUG_TOOLBAR_PATCH_SETTINGS = True
 except ImportError:
     pass
+
+LOGGING['loggers']['$PROJECT_NAME']['handlers'] = ['console']
+LOGGING['loggers']['$PROJECT_NAME']['level'] = logging.DEBUG
