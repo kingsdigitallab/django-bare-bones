@@ -1,5 +1,6 @@
 ansible_python_interpreter: /usr/bin/python3
 app: {name: $PROJECT_NAME}
+git: {url: 'https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh'}
 motd: {file: 00-kdl}
 postgresql: {admin_user: postgres, cluster_name: main, cluster_reset: false, default_auth_method: trust,
   encoding: UTF-8, initial_data_file: data.sql, locale: en_GB.UTF-8, user: $PROJECT_NAME}
