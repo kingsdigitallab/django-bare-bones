@@ -310,8 +310,11 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$ENV{BS_PH_MIDDLEWARE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URL_IMPORTS:$ENV{BS_PH_URL_IMPORTS}:g' {} \;
-perl -pi -e 's:\$PH_BOWER_FRAMEWORK:$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
-
+if [[ "$BS_BOWER_FRAMEWORK" != "none" ]]; then
+    perl -pi -e 's:\$PH_BOWER_FRAMEWORK:,\n$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
+else
+    perl -pi -e 's:\$PH_BOWER_FRAMEWORK:\n$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
+fi
 
 export BS_PROJECT_KEY=$BS_PROJECT_KEY
 export BS_PROJECT_TITLE=$BS_PROJECT_TITLE
