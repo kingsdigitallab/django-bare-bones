@@ -1,7 +1,8 @@
 from .base import *  # noqa
 
+ALLOWED_HOSTS = ['$PROJECT_NAME.kdl.kcl.ac.uk']
+
 INTERNAL_IPS = INTERNAL_IPS + ['']
-ALLOWED_HOSTS = ['']
 
 DATABASES = {
     'default': {
