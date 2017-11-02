@@ -56,6 +56,9 @@ The default virtual machine is configured with:
 
 ## Changelog
 
+#### Release 0.4
+* Complete rewrite with improved UI
+
 #### Release 0.3.2
 * Added fix for SSH hanging upon login with virtualbox provider.
 
