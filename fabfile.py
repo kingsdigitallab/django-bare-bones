@@ -230,13 +230,13 @@ def upload_local_settings():
 @task
 def own_django_log():
     """ make sure logs/django.log is owned by www-data"""
-    # GN: why do we need VE for this task?
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    require('srvr', 'path', provided_by=env.servers)
 
     with quiet():
         log_path = os.path.join(env.path, 'logs', 'django.log')
         if run('ls {}'.format(log_path)).succeeded:
             sudo('chown www-data:www-data {}'.format(log_path))
+            sudo('chmod g+rw {}'.format(log_path))
 
 
 @task
@@ -247,8 +247,7 @@ def fix_permissions(category='static'):
         'static' (default): django static path + general project path
         'virtualenv': fix the virtualenv permissions
     '''
-    # GN: why do we need VE?
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    require('srvr', 'path', provided_by=env.servers)
 
     processed = False
 
