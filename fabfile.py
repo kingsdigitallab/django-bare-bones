@@ -180,6 +180,7 @@ def deploy(version=None):
     # update_index()
     # clear_cache()
     touch_wsgi()
+    check_deploy()
 
 
 @task
@@ -323,3 +324,12 @@ def touch_wsgi():
     with cd(os.path.join(env.path, PROJECT_NAME)), \
             prefix(env.within_virtualenv):
         run('touch wsgi.py')
+
+
+@task
+def check_deploy():
+    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+
+    if env.srvr in ['stg', 'liv']:
+        with cd(env.path), prefix(env.within_virtualenv):
+            run('./manage.py check --deploy')
