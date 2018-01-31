@@ -1,4 +1,5 @@
-django
+# GN: 31 jan 2018, wagtail 1.13.1 doesn't play well with django 2.0
+django<2
 django-compressor
 django-extensions
 django-grappelli
