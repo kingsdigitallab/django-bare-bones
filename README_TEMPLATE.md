@@ -2,7 +2,7 @@
 
 This is the repository for the $PROJECT_NAME project at [Kings Digital Lab](https://kdl.kcl.ac.uk)
 
-This project is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. 
+This project uses the technologies outlined in our [Technology Stack](https://stackshare.io/kings-digital-lab/django) and is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment.
 
 ## Getting started
 1. Enter the project directory: `cd $PROJECT_NAME-django`

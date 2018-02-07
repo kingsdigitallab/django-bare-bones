@@ -1,7 +1,7 @@
 # django-bare-bones
 Start up configuration for KDL Django based projects.
 
-This project is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. The project also includes the choice of [Bulma](http://bulma.io) or [Foundation](http://foundation.zurb.com/).
+This project uses the technologies outlined in our [Technology Stack](https://stackshare.io/kings-digital-lab/django) and is configured to use [Vagrant](https://www.vagrantup.com/) for local development and [Fabric](http://www.fabfile.org/) for deployment. The project also includes the choice of [Bulma](http://bulma.io) or [Foundation](http://foundation.zurb.com/).
 
 Pre-configured options include [LDAP Authentication](https://github.com/kingsdigitallab/django-kdl-ldap), [GeoDjango](https://docs.djangoproject.com/en/1.11/ref/contrib/gis/), [ActiveCollab Digger](https://github.com/kingsdigitallab/django-activecollab-digger), [Wagtail](https://wagtail.io) and [Haystack](http://haystacksearch.org)
 
