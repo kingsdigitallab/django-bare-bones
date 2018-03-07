@@ -1,22 +1,16 @@
-{% load staticfiles compress require %}
+{% load staticfiles compress  %}
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{% block meta_title %}{% endblock %} | PREOJECT_TITLE</title>
+  <title>{% block meta_title %}{% endblock %} | $PROJECT_TITLE</title>
+  <meta name="author" content="King's Digital Lab">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   {% compress css %}
-  {# SCSS compilation relies on django compressor #}
   <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/main.scss' %}">
-  <!-- FontAwesome -->
-  {#
-    Copy _variable.scss and font-awesome.scss and change the @import paths
-    to point to the project ones rather than to the vendor folder
-  #}
-  <link rel="stylesheet" type="text/x-scss" href="{% static 'scss/font-awesome.scss' %}">
   {% endcompress %}
 </head>
 <body>
@@ -28,28 +22,32 @@
     {% include 'includes/navigation.html' %}
   </nav>
 
-  <div class="row">
-    <div class="large-12 columns">
-      <section class="main">
-        {% block title %}{% endblock %}
-        {% block main %}
-        {% endblock %}
-      </section>
-    </div>
-  </div>
+  <main>
+    {% block title %}{% endblock %}
+    {% block main %}
+    {% endblock %}
+  </main>
 
   <footer>
     {% block footer %}
     {% include 'includes/footer.html' %}
     {% endblock %}
   </footer>
-  
-  <!-- define requirejs config settings. -->
-  <script type="text/javascript">
-    {% include 'includes/config.js' %}
-  </script>
-  {% require_module 'config' %}
+
+  {% compress js %}
+  <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  {% endcompress %}
 
   {% block footer_scripts %}{% endblock %}
+
+  {% compress js %}
+  <script src="{% static 'js/google_analytics.js' %}"></script>
+  <script>
+    ga('create', '{{ GA_ID }}', 'auto');
+    ga('send', 'pageview');
+  </script>
+  {% endcompress %}
 </body>
 </html>

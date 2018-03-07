@@ -1,0 +1,4 @@
+from kdl_ldap.signal_handlers import \
+    register_signal_handlers as kdl_ldap_register_signal_hadlers
+
+kdl_ldap_register_signal_hadlers()

@@ -9,17 +9,10 @@
   - name: fix debian sudoers file
     become: yes
     lineinfile:
-      dest: /etc/sudoers
+      path: /etc/sudoers
       backup: yes
       regexp: "^%sudo\\s+ALL=\\(ALL:ALL\\)\\s+ALL$"
       line: "%sudo   ALL=(ALL) NOPASSWD: ALL"
-    tags:
-      - system
-
-  - name: apt | add wheezy backports
-    apt_repository:
-      repo: deb http://http.debian.net/debian wheezy-backports main
-      state: present
     tags:
       - system
 
@@ -27,21 +20,21 @@
     apt:
       pkg: apt-transport-https
       state: installed
-      # update_cache: yes
+      update_cache: yes
     tags:
       -system
 
   - name: apt | add elasticsearch key
     become: yes
     apt_key:
-      url: https://packages.elastic.co/GPG-KEY-elasticsearch
+      url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
     tags:
       - system
 
   - name: apt | add elasticsearch sources
     apt_repository:
-      repo: 'deb http://packages.elastic.co/elasticsearch/1.6/debian stable main'
+      repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
       state: present
     tags:
       - system
@@ -54,6 +47,45 @@
     with_items: '{{ system_packages }}'
     tags:
       - system
+
+  - name: Upgrade all packages to the latest version
+    apt:
+      upgrade: yes
+    tags:
+      - system
+
+  - name: git-lfs | add git ppa
+    become: yes
+    command: add-apt-repository ppa:git-core/ppa
+    tags:
+      - system
+      - git
+
+  - name: git-lfs | download
+    become: yes
+    get_url:
+      url: '{{ git.url }}'
+      dest: /tmp
+      mode: 0777
+    tags:
+      - system
+      - git
+
+  - name: git-lfs | setup
+    become: yes
+    command: /tmp/script.deb.sh
+    tags:
+      - system
+      - git
+
+  - name: git-lfs | install
+    apt:
+      pkg: git-lfs
+      state: installed
+      update_cache: yes
+    tags:
+      - system
+      - git
 
   - name: zsh | clone oh-my-zsh repo
     git: repo={{ zsh.oh_my_zsh }} dest={{ user_home }}/.oh-my-zsh
@@ -69,22 +101,49 @@
     user: name=vagrant shell=/bin/zsh
     tags:
       - system
+  
+  - name: motd | clean existing
+    become: yes
+    shell: 'rm -rf /etc/update-motd.d/*'
+    tags:
+      - system
+
+  - name: motd | deploy motd
+    become: yes
+    copy: src={{ motd.file }} dest=/etc/update-motd.d/00-kdl owner=root
+    tags:
+      - system
+
+  - name: motd | permissions
+    become: yes
+    shell: 'chmod +x /etc/update-motd.d/*'
+    tags:
+      - system
 
 - hosts: all
   vars_files:
     - vars.yml
   gather_facts: false
   tasks:
-  - name: pip | setup virtualenv
-    file: path={{ python.virtualenv_location }} state=directory
-  - command: virtualenv {{ python.virtualenv_location }}
+  - name: python | make python3 default version
+    become: yes
+    alternatives:
+      link: /usr/bin/python
+      name: python
+      path: /usr/bin/python3
+      priority: 10
+
+  - name: pip | install virtualenv
+    become: yes
+    pip:
+      name: virtualenv
+      state: latest
     tags:
       - python
 
-  - name: pip | Installing fix for setuptools (requirements-setuptools-fix.txt)
-    pip:
-      requirements: "{{ project_root }}/requirements-setuptools-fix.txt"
-      virtualenv: "{{ python.virtualenv_location }}"
+  - name: pip | setup virtualenv
+    file: path={{ python.virtualenv_location }} state=directory
+  - command: virtualenv {{ python.virtualenv_location }}
     tags:
       - python
 
@@ -116,18 +175,25 @@
     - vars.yml
   # gather_facts: false
   tasks:
-  - name: locale | setup gb locale
+  - name: postgresql | setup gb locale
+    become: yes
     locale_gen:
       name: "{{ postgresql.locale }}"
       state: present
+    tags:
+      - db
+
+  - name: postgresql | get installed version
     become: yes
+    shell: 'ls /etc/postgresql/*/main/pg_hba.conf | cut -d / -f4'
+    register: postgresql_version
     tags:
       - db
 
   - name: postgresql | ensure postgresql user can authenticate
     become: yes
     lineinfile:
-      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
       regexp: "^local\\s+all\\s+{{ postgresql.admin_user }}\\s+peer$"
       line: "local    all    {{ postgresql.admin_user }}    {{ postgresql.default_auth_method }}"
@@ -137,12 +203,23 @@
   - name: postgresql | ensure all users can authenticate
     become: yes
     lineinfile:
-      dest: /etc/postgresql/{{ postgresql.version }}/main/pg_hba.conf
+      path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
       regexp: "^local\\s+all\\s+all\\s+peer$"
       line: "local    all    all    {{ postgresql.default_auth_method }}"
     notify:
       - postgresql | restart postgres
+    tags:
+      - db
+
+  - name: elasticsearch | change JVM Heap To start at 256M
+    become: yes
+    lineinfile:
+      path: /etc/elasticsearch/jvm.options
+      backup: yes
+      regexp: "^-Xms2g$"
+      line: "-Xms256m"
+    notify:
       - elasticsearch | restart elasticsearch
     tags:
       - db
@@ -209,6 +286,13 @@
       - db
       - data
 
+  - name: posgresql | create postgis extension if available
+    become_user: "{{ postgresql.admin_user }}"
+    command: psql -U {{ postgresql.admin_user }} -d {{ app.name }} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+    tags:
+      - db
+      - data
+
   handlers:
   - name: postgresql | apply privileges
     become_user: "{{ postgresql.admin_user }}"
@@ -250,6 +334,12 @@
     tags:
       - django
 
+  - name: django | add default (vagrant/vagrant) superuser
+    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    ignore_errors: yes # The user may already exist
+    tags:
+      - django
+
 - hosts: all
   vars_files:
       - vars.yml
@@ -263,6 +353,7 @@
 
   - name: git | flake8 pre-commit hook
     command: "{{ user_home }}/venv/bin/flake8 --install-hook=git"
+    ignore_errors: yes # Stop errors if it already exists
     args:
       chdir: "{{ project_root }}"
   - command: "git config flake8.strict True"

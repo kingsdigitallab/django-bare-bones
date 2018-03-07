@@ -2,14 +2,7 @@
     "name": "$PROJECT_NAME",
     "version": "0.1",
     "dependencies": {
-        "almond": null,
-        "jquery": null,
-        "foundation-sites": null,
-        "font-awesome": null,
-        "motion-ui": null,
-        "r.js": null,
-        "requirejs": null,
-        "requirejs-babel": null
+        "jquery": null$PH_BOWER_FRAMEWORK
     },
     "main": "assets/js/main.js",
     "ignore": [

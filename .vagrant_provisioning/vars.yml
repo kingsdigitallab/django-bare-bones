@@ -1,13 +1,14 @@
+ansible_python_interpreter: /usr/bin/python3
 app: {name: $PROJECT_NAME}
+git: {url: 'https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh'}
+motd: {file: 00-kdl}
 postgresql: {admin_user: postgres, cluster_name: main, cluster_reset: false, default_auth_method: trust,
-  encoding: UTF-8, initial_data_file: data.sql, locale: en_GB.UTF-8, user: $PROJECT_NAME,
-  version: 9.1}
+  encoding: UTF-8, initial_data_file: data.sql, locale: en_GB.UTF-8, user: $PROJECT_NAME}
 project_root: /vagrant
-python: {requirements: requirements-vagrant.txt, virtualenv_location: /home/vagrant/venv}
-system_packages: [ack-grep, zsh, vim-nox, python-dev, python-pip, python-psycopg2,
-  python-setuptools, python-virtualenv, nfs-common, postgresql, postgresql-client,
-  postgresql-server-dev-all, adminer, libldap2-dev, libsasl2-dev, libjpeg-dev, nodejs,
-  openjdk-7-jre, elasticsearch, libxml2-dev, libxslt-dev, git, git-core]
+python: {requirements: requirements-dev.txt, virtualenv_location: /home/vagrant/venv}
+system_packages: [ack-grep, adminer, aptitude, binutils, elasticsearch, gdal-bin, git, git-core, libgdal-dev, libjpeg-dev,
+  libldap2-dev, libproj-dev,libsasl2-dev, libssl-dev, libxml2-dev, libxslt-dev, nfs-common, open-vm-tools,
+  openjdk-8-jre, postgis, postgresql, postgresql-client, postgresql-server-dev-all, python3-dev, python3-gdal,
+  python3-pip, python3-psycopg2, python3-setuptools, vim-nox, zsh]
 user_home: /home/vagrant
-vim: {spf13: 'http://j.mp/spf13-vim3', spf13_install: /home/vagrant/spf13.install}
 zsh: {oh_my_zsh: 'https://github.com/robbyrussell/oh-my-zsh.git', zshrc: zshrc}

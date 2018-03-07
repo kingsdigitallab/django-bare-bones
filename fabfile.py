@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-from fabric.api import cd, env, prefix, quiet, require, run, sudo, task
+import os.path
+import sys
+from functools import wraps
+
+from django.conf import settings as django_settings
+from django.core.management.utils import get_random_secret_key
+from fabric.api import (cd, env, prefix, prompt, put, quiet, require, run,
+                        settings, sudo, task)
 from fabric.colors import green, yellow
 from fabric.contrib import django
-from functools import wraps
-import sys
-import os.path
-
 
 # put project directory in path
 project_root = os.path.abspath(os.path.dirname(__file__))
@@ -27,6 +29,9 @@ PROJECT_NAME = '$PROJECT_NAME'
 # Git repository pointer
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
+
+
+env.gateway = 'ssh.kdl.kcl.ac.uk'
 # Host names used as deployment targets
 env.hosts = ['{}.kdl.kcl.ac.uk'.format(PROJECT_NAME)]
 # Absolute filesystem path to project 'webroot'
@@ -41,13 +46,13 @@ django.project(PROJECT_NAME)
 
 # Set FABRIC_GATEWAY = 'username@proxy.x' in local.py
 # if you are behind a proxy.
-FABRIC_GATEWAY = getattr(settings, 'FABRIC_GATEWAY', None)
+FABRIC_GATEWAY = getattr(django_settings, 'FABRIC_GATEWAY', None)
 if FABRIC_GATEWAY:
     env.forward_agent = True
     env.gateway = FABRIC_GATEWAY
 
 # Name of linux user who deploys on the remote server
-env.user = settings.FABRIC_USER
+env.user = django_settings.FABRIC_USER
 
 
 def server(func):
@@ -152,9 +157,7 @@ def install_requirements():
         reqs = 'requirements.txt'
 
     with cd(env.path), prefix(env.within_virtualenv):
-        # GN: | cat to prevent shard-shaped progress bar polluting the output
-        # Until --no-progress-bar option appears in new pip version
-        run('pip install -q --no-cache -U -r {} | cat'.format(reqs))
+        run('pip install -q --no-cache -U -r {}'.format(reqs))
 
 
 @task
@@ -169,6 +172,7 @@ def reinstall_requirement(which):
 def deploy(version=None):
     update(version)
     install_requirements()
+    upload_local_settings()
     own_django_log()
     fix_permissions()
     migrate()
@@ -176,6 +180,7 @@ def deploy(version=None):
     # update_index()
     # clear_cache()
     touch_wsgi()
+    check_deploy()
 
 
 @task
@@ -198,15 +203,41 @@ def update(version=None):
 
 
 @task
+def upload_local_settings():
+    require('srvr', 'path', provided_by=env.servers)
+
+    with cd(env.path):
+        with settings(warn_only=True):
+            if run('ls {}/settings/local.py'.format(PROJECT_NAME)).failed:
+                db_host = prompt('Database host: ')
+                db_pwd = prompt('Database password: ')
+
+                put('{}/settings/local_{}.py'.format(PROJECT_NAME, env.srvr),
+                    '{}/settings/local.py'.format(PROJECT_NAME), mode='0664')
+
+                run('echo >> {}/settings/local.py'.format(PROJECT_NAME))
+                run('echo '
+                    '"DATABASES[\'default\'][\'PASSWORD\'] = \'{}\'" >>'
+                    '{}/settings/local.py'.format(db_pwd, PROJECT_NAME))
+                run('echo '
+                    '"DATABASES[\'default\'][\'HOST\'] = \'{}\'" >>'
+                    '{}/settings/local.py'.format(db_host, PROJECT_NAME))
+                run('echo '
+                    '"SECRET_KEY = \'{}\'" >>'
+                    '{}/settings/local.py'.format(
+                        get_random_secret_key(), PROJECT_NAME))
+
+
+@task
 def own_django_log():
     """ make sure logs/django.log is owned by www-data"""
-    # GN: why do we need VE for this task?
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    require('srvr', 'path', provided_by=env.servers)
 
     with quiet():
         log_path = os.path.join(env.path, 'logs', 'django.log')
         if run('ls {}'.format(log_path)).succeeded:
             sudo('chown www-data:www-data {}'.format(log_path))
+            sudo('chmod g+rw {}'.format(log_path))
 
 
 @task
@@ -217,8 +248,7 @@ def fix_permissions(category='static'):
         'static' (default): django static path + general project path
         'virtualenv': fix the virtualenv permissions
     '''
-    # GN: why do we need VE?
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    require('srvr', 'path', provided_by=env.servers)
 
     processed = False
 
@@ -294,3 +324,12 @@ def touch_wsgi():
     with cd(os.path.join(env.path, PROJECT_NAME)), \
             prefix(env.within_virtualenv):
         run('touch wsgi.py')
+
+
+@task
+def check_deploy():
+    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+
+    if env.srvr in ['stg', 'liv']:
+        with cd(env.path), prefix(env.within_virtualenv):
+            run('./manage.py check --deploy')

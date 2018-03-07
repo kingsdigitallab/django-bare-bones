@@ -49,7 +49,7 @@ plugins=(command-not-found colorize debian django history-substring-search linux
 
 # User configuration
 
-export PATH="/usr/local/rvm/gems/ruby-1.9.3-p547/bin:/usr/local/rvm/gems/ruby-1.9.3-p547@global/bin:/usr/local/rvm/rubies/ruby-1.9.3-p547/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/local/rvm/bin"
+export PATH="/usr/local/rvm/gems/ruby-1.9.3-p547/bin:/usr/local/rvm/gems/ruby-1.9.3-p547@global/bin:/usr/local/rvm/rubies/ruby-1.9.3-p547/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/local/rvm/bin:/usr/sbin:$PATH"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -68,7 +68,11 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 # zsh syntax highlighting
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
+# Remounts the vagrant shared folder if needed
+[ "$(ls -A /vagrant)" ] || sudo mount -t vboxsf -o uid=1000,gid=1000 vagrant /vagrant
+
 # Activates the virtual environment
 source ~/venv/bin/activate
+
 # and moves to the project directory
 cd /vagrant

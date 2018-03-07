@@ -7,14 +7,18 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 For production settings see
 https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 """
-# from ddhldap.settings import *
 
+import getpass
+import logging
 import os
+
+$PH_SETTINGS_MODULES
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 PROJECT_NAME = '$PROJECT_NAME'
-PROJECT_TITLE = 'Change the title in the settings'
+PROJECT_TITLE = '$PROJECT_TITLE'
 
 # -----------------------------------------------------------------------------
 # Core Settings
@@ -43,18 +47,28 @@ CACHES = {
     }
 }
 
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-}
+CSRF_COOKIE_SECURE = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-TEMPLATE_DEBUG = False
 
-INSTALLED_APPS = (
+# -----------------------------------------------------------------------------
+# EMAIL SETTINGS
+# -----------------------------------------------------------------------------
+
+DEFAULT_FROM_EMAIL = 'noreply@kcl.ac.uk'
+EMAIL_HOST = 'smtp.kcl.ac.uk'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[Django {}] '.format(PROJECT_NAME)
+EMAIL_USE_TLS = False
+
+# Sender of error messages to ADMINS and MANAGERS
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+INSTALLED_APPS = [
     'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,18 +76,22 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'compressor',
+]
 
-    'require',
-)
+INSTALLED_APPS += [    # your project apps here
+    $PH_INSTALLED_APPS
+]
 
-INSTALLED_APPS += (
-    # your project apps here
-)
+INTERNAL_IPS = ['127.0.0.1']
 
-INTERNAL_IPS = ('127.0.0.1', )
-
-# https://docs.djangoproject.com/en/dev/topics/logging/
-import logging
+# https://docs.djangoproject.com/en/dev/topics/i18n/
+LANGUAGE_CODE = 'en-gb'
+TIME_ZONE = 'Europe/London'
+USE_I18N = True
+USE_L10N = False
+USE_TZ = True
 
 LOGGING_ROOT = os.path.join(BASE_DIR, 'logs')
 LOGGING_LEVEL = logging.WARN
@@ -116,11 +134,6 @@ LOGGING = {
             'level': LOGGING_LEVEL,
             'propagate': True
         },
-        # 'django_auth_ldap': {
-        #     'handlers': ['file'],
-        #     'level': LOGGING_LEVEL,
-        #     'propagate': True
-        # },
         '$PROJECT_NAME': {
             'handlers': ['file'],
             'level': LOGGING_LEVEL,
@@ -134,8 +147,7 @@ LOGGING = {
     }
 }
 
-
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -144,7 +156,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+    $PH_MIDDLEWARE
+]
 
 ROOT_URLCONF = PROJECT_NAME + '.urls'
 
@@ -164,30 +177,30 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
+                $PH_CONTEXT_PROCESSORS
             ],
-            'debug': False,
         },
     },
 ]
 
-# https://docs.djangoproject.com/en/dev/topics/i18n/
-LANGUAGE_CODE = 'en-gb'
-TIME_ZONE = 'Europe/London'
-USE_I18N = True
-USE_L10N = False
-USE_TZ = True
-
 WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
-
 
 # -----------------------------------------------------------------------------
 # Authentication
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth
-# https://scm.cch.kcl.ac.uk/hg/ddhldap-django
 # -----------------------------------------------------------------------------
 
-# AUTH_LDAP_REQUIRE_GROUP = 'cn=GROUP_NAME,' + LDAP_BASE_OU
+if 'wagtail.wagtailcore' in INSTALLED_APPS:
+    LOGIN_URL = '/wagtail/login/'
+else:
+    LOGIN_URL = '/admin/login/'
 
+# -----------------------------------------------------------------------------
+# Sessions
+# https://docs.djangoproject.com/en/dev/ref/settings/#sessions
+# -----------------------------------------------------------------------------
+
+SESSION_COOKIE_SECURE = True
 
 # -----------------------------------------------------------------------------
 # Static files (CSS, JavaScript, Images)
@@ -209,34 +222,11 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder',
 )
 
-STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
-
 MEDIA_URL = STATIC_URL + 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL.strip('/'))
 
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
-
-# -----------------------------------------------------------------------------
-# EMAIL SETTINGS
-# -----------------------------------------------------------------------------
-
-EMAIL_HOST = 'smtp.kcl.ac.uk'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'noreply@kcl.ac.uk'
-# Sender of error messages to ADMINS and MANAGERS
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
-EMAIL_SUBJECT_PREFIX = '[Django {}] '.format(PROJECT_NAME)
-
-# -----------------------------------------------------------------------------
-# Sessions
-# https://docs.djangoproject.com/en/1.8/ref/settings/#sessions
-# -----------------------------------------------------------------------------
-
-SESSION_COOKIE_SECURE = True
 
 # -----------------------------------------------------------------------------
 # Installed Applications Settings
@@ -266,52 +256,9 @@ COMPRESS_PRECOMPILERS = (
 GRAPPELLI_ADMIN_TITLE = PROJECT_TITLE
 
 # -----------------------------------------------------------------------------
-# Django-Require
-# https://github.com/etianen/django-require
-# -----------------------------------------------------------------------------
-
-# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
-REQUIRE_BASE_URL = 'js'
-
-# The name of a build profile to use for your project, relative to
-# REQUIRE_BASE_URL. A sensible value would be 'app.build.js'.
-# Leave blank to use the built-in default build profile. Set to False to
-# disable running the default profile (e.g. if only using it to build
-# Standalone Modules)
-REQUIRE_BUILD_PROFILE = False
-
-# The name of the require.js script used by your project, relative to
-# REQUIRE_BASE_URL.
-REQUIRE_JS = '../vendor/requirejs/require.js'
-
-# A dictionary of standalone modules to build with almond.js.
-# See the section on Standalone Modules, below.
-REQUIRE_STANDALONE_MODULES = {
-    'config': {
-        # Where to output the built module, relative to REQUIRE_BASE_URL.
-        'out': 'config-built.js',
-
-        # Optional: A build profile used to build this standalone module.
-        'build_profile': 'config.build.js',
-    }
-}
-
-# Whether to run django-require in debug mode.
-REQUIRE_DEBUG = DEBUG
-
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ('build.txt', )
-
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and
-# rhino if not.
-REQUIRE_ENVIRONMENT = 'node'
-
-# -----------------------------------------------------------------------------
 # FABRIC
 # -----------------------------------------------------------------------------
 
-import getpass
 FABRIC_USER = getpass.getuser()
 
 # -----------------------------------------------------------------------------
@@ -320,3 +267,14 @@ FABRIC_USER = getpass.getuser()
 
 # Google Analytics ID
 GA_ID = ''
+
+# -----------------------------------------------------------------------------
+# Automatically generated settings
+# -----------------------------------------------------------------------------
+
+# Check which db engine to use:
+db_engine = 'django.db.backends.postgresql_psycopg2'
+if 'django.contrib.gis' in INSTALLED_APPS:
+    db_engine = 'django.contrib.gis.db.backends.postgis'
+
+$PH_SETTINGS_INLINE
