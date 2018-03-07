@@ -1,12 +1,10 @@
-# GN: 31 jan 2018, wagtail 1.13.1 doesn't play well with django 2.0
-django<2
+django == 2.0
 django-compressor
 django-extensions
-django-grappelli
 django-libsass
 django-model-utils
 django-redis
-psycopg2
+psycopg2-binary
 redis
 elasticsearch>=5.0.0,<6.0.0
 

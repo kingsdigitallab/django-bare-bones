@@ -1,14 +1,14 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
+from django.conf.urls import url
 
 $PH_URL_IMPORTS
 
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^grappelli/', include('grappelli.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    path('admin/', admin.site.urls),
     $PH_URLS
     $PH_CATCH_ALL_URL
 ]
@@ -19,10 +19,9 @@ urlpatterns = [
 try:
     if settings.DEBUG:
         import debug_toolbar
-        urlpatterns += [
-            url(r'^__debug__/',
-                include(debug_toolbar.urls)),
-        ]
+        urlpatterns = [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns
 except ImportError:
     pass
 
