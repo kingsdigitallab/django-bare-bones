@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.urls import include, path
 from django.contrib import admin
-from django.conf.urls import url
 
 $PH_URL_IMPORTS
 
