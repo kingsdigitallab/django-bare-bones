@@ -1,1 +1,1 @@
-    path('', include('wagtail.core.urls')),
+    path('search/', include('haystack.urls'))
