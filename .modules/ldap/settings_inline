@@ -1,3 +1,4 @@
+AUTH_LDAP_REQUIRE_GROUP = (
     (
         LDAPGroupQuery('cn=kdl-staff,' + LDAP_BASE_OU) |
         LDAPGroupQuery('cn=$LDAP_GROUP,' + LDAP_BASE_OU)
