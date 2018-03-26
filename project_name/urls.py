@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.contrib import admin
 
 $PH_URL_IMPORTS
@@ -19,7 +19,7 @@ try:
     if settings.DEBUG:
         import debug_toolbar
         urlpatterns = [
-            url(r'^__debug__/', include(debug_toolbar.urls)),
+            re_path(r'^__debug__/', include(debug_toolbar.urls)),
         ] + urlpatterns
 except ImportError:
     pass
