@@ -1,1 +1,1 @@
-    url(r'^digger/', include('activecollab_digger.urls')),
+    path('digger/', include('activecollab_digger.urls')),

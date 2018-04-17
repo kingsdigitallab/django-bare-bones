@@ -56,6 +56,9 @@ The default virtual machine is configured with:
 
 ## Changelog
 
+#### Release 0.4.1
+* Django 2 support
+
 #### Release 0.4
 * Complete rewrite with improved UI
 

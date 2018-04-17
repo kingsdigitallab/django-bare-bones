@@ -23,6 +23,11 @@ SECRET_KEY = '12345'
 
 FABRIC_USER = ''
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend',
+)
+
 # -----------------------------------------------------------------------------
 # Django Debug Toolbar
 # http://django-debug-toolbar.readthedocs.org/en/latest/
@@ -41,3 +46,5 @@ except ImportError:
 LOGGING['loggers']['$PROJECT_NAME'] = {}
 LOGGING['loggers']['$PROJECT_NAME']['handlers'] = ['console']
 LOGGING['loggers']['$PROJECT_NAME']['level'] = logging.DEBUG
+
+

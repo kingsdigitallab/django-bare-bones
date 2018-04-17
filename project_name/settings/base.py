@@ -69,7 +69,6 @@ EMAIL_USE_TLS = False
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 INSTALLED_APPS = [
-    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,7 +151,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -190,7 +188,7 @@ WSGI_APPLICATION = PROJECT_NAME + '.wsgi.application'
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth
 # -----------------------------------------------------------------------------
 
-if 'wagtail.wagtailcore' in INSTALLED_APPS:
+if 'wagtail.core' in INSTALLED_APPS:
     LOGIN_URL = '/wagtail/login/'
 else:
     LOGIN_URL = '/admin/login/'
@@ -247,13 +245,6 @@ COMPRESS_CSS_FILTERS = [
 COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
-
-# -----------------------------------------------------------------------------
-# Django Grappelli
-# http://django-grappelli.readthedocs.org/en/latest/
-# -----------------------------------------------------------------------------
-
-GRAPPELLI_ADMIN_TITLE = PROJECT_TITLE
 
 # -----------------------------------------------------------------------------
 # FABRIC
