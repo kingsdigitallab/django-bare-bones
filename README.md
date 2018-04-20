@@ -49,6 +49,19 @@ The default virtual machine is configured with:
 * Python 3
 * ElasticSearch 5/Java 8 (256-2048M Heap)
 
+
+## Deployment
+
+Detailed instructions for initial deployment are available in the shared drive under `Group Share/Systems/Servers`.
+
+For an initial deployment:
+* Run `fab <instance> setup_environment`
+* Run `fab <instance> deploy:<branch>` as normal - the script will prompt for further details as required
+* Update UWSGI configuration to reference the newly deployed application
+
+For an update deployment:
+* Run `fab <instance> deploy:<branch>`
+
 ## Known Issues:
 
 * Ctrl-c does not work when a whiptail window is visible. Cancel button replicates this functionality
