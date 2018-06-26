@@ -58,7 +58,7 @@ DEBUG = False
 # -----------------------------------------------------------------------------
 
 DEFAULT_FROM_EMAIL = 'noreply@kcl.ac.uk'
-EMAIL_HOST = 'smtp.kcl.ac.uk'
+EMAIL_HOST = 'smtp.cch.kcl.ac.uk'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
