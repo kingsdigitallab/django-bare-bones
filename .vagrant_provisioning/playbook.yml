@@ -42,7 +42,7 @@
   - name: apt | install required system packages
     apt:
       pkg: '{{ item }}'
-      state: installed
+      state: present
       update_cache: yes
     with_items: '{{ system_packages }}'
     tags:
@@ -53,39 +53,6 @@
       upgrade: yes
     tags:
       - system
-
-  - name: git-lfs | add git ppa
-    become: yes
-    command: add-apt-repository ppa:git-core/ppa
-    tags:
-      - system
-      - git
-
-  - name: git-lfs | download
-    become: yes
-    get_url:
-      url: '{{ git.url }}'
-      dest: /tmp
-      mode: 0777
-    tags:
-      - system
-      - git
-
-  - name: git-lfs | setup
-    become: yes
-    command: /tmp/script.deb.sh
-    tags:
-      - system
-      - git
-
-  - name: git-lfs | install
-    apt:
-      pkg: git-lfs
-      state: installed
-      update_cache: yes
-    tags:
-      - system
-      - git
 
   - name: zsh | clone oh-my-zsh repo
     git: repo={{ zsh.oh_my_zsh }} dest={{ user_home }}/.oh-my-zsh
@@ -101,7 +68,7 @@
     user: name=vagrant shell=/bin/zsh
     tags:
       - system
-  
+
   - name: motd | clean existing
     become: yes
     shell: 'rm -rf /etc/update-motd.d/*'
