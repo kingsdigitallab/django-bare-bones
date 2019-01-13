@@ -30,7 +30,6 @@ PROJECT_NAME = '$PROJECT_NAME'
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
 
-
 env.gateway = 'ssh.kdl.kcl.ac.uk'
 # Host names used as deployment targets
 env.hosts = ['{}.kdl.kcl.ac.uk'.format(PROJECT_NAME)]
@@ -57,6 +56,7 @@ env.user = django_settings.FABRIC_USER
 
 def server(func):
     """Wraps functions that set environment variables for servers"""
+
     @wraps(func)
     def decorated(*args, **kwargs):
         try:
@@ -65,6 +65,7 @@ def server(func):
             env.servers = [func]
 
         return func(*args, **kwargs)
+
     return decorated
 
 
@@ -291,6 +292,9 @@ def migrate(app=None):
 @task
 def collect_static(process=False):
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+
+    with cd(env.path):
+        run('npm i')
 
     if env.srvr in ['local', 'vagrant']:
         print(yellow('Do not run collect_static on local servers'))

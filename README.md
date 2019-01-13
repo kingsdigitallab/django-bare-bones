@@ -72,10 +72,13 @@ For an update deployment:
 
 #### Release 0.5
 * Replaced bower with npm. __Please use npm i X to install a new js / css library__.
+* reason: bower is deprecated and npm is more deterministic when deploying versions to servers
 * libraries are installed into node_modules folder, which is excluded from repo with .gitignore
 * package.json and package-lock.json now replace bower.json, they are generated from npm commands
-* vue.js is included by default
-* don't load google analytics if GA_ID not set
+* __make sure those two files are added to your github repo__
+* before deploying with fabfile make sure __npm is installed on the VM__
+* vue.js is now included by default
+* google analytics only loaded when GA_ID is set
 
 #### Release 0.4.1
 * Django 2 support
