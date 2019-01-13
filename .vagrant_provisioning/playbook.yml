@@ -1,13 +1,14 @@
 ---
+# Install and configure system packages
+# run as root
 - hosts: all
   vars_files:
     - vars.yml
   gather_facts: false
-  become: true
+  become: yes
 
   tasks:
   - name: fix debian sudoers file
-    become: yes
     lineinfile:
       path: /etc/sudoers
       backup: yes
@@ -19,13 +20,12 @@
   - name: apt | install https transport for apt
     apt:
       pkg: apt-transport-https
-      state: installed
+      state: present
       update_cache: yes
     tags:
       -system
 
   - name: apt | add elasticsearch key
-    become: yes
     apt_key:
       url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
@@ -41,10 +41,9 @@
 
   - name: apt | install required system packages
     apt:
-      pkg: '{{ item }}'
+      pkg: '{{ system_packages }}'
       state: present
       update_cache: yes
-    with_items: '{{ system_packages }}'
     tags:
       - system
 
@@ -70,36 +69,51 @@
       - system
 
   - name: motd | clean existing
-    become: yes
     shell: 'rm -rf /etc/update-motd.d/*'
     tags:
       - system
 
   - name: motd | deploy motd
-    become: yes
     copy: src={{ motd.file }} dest=/etc/update-motd.d/00-kdl owner=root
     tags:
       - system
 
   - name: motd | permissions
-    become: yes
     shell: 'chmod +x /etc/update-motd.d/*'
     tags:
       - system
 
-- hosts: all
-  vars_files:
-    - vars.yml
-  gather_facts: false
-  tasks:
   - name: python | make python3 default version
-    become: yes
     alternatives:
       link: /usr/bin/python
       name: python
       path: /usr/bin/python3
       priority: 10
+    tags:
+      - system
+      - python
 
+  - name: npm | upgrade node.js and npm
+    npm:
+      name: "n"
+      global: true
+    tags:
+      - system
+      - javascript
+  - command: "n stable"
+    tags:
+      - system
+      - javascript
+
+# Python and Javascript Package Managers
+# run as vagrant
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  gather_facts: false
+
+  tasks:
   - name: pip | install virtualenv
     become: yes
     pip:
@@ -137,13 +151,41 @@
     tags:
       - python
 
+  - name: npm | create dummy package.json
+    # this creates a dummy package.json. Needed for all other npm commands.
+    command: "npm init -y"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/package.json"
+    tags:
+      - javascript
+
+  - name: npm | install original javascript packages from vars.yml
+    # only for the initial setup of the repository
+    # it will install packages selected during bare-bone bootstrap
+    command: "npm i {{ npm.original_packages }}"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/package-lock.json"
+    tags:
+      - javascript
+
+  - name: npm | install javascript packages from package.json
+    npm:
+      path: "{{ project_root }}"
+    tags:
+      - javascript
+
+# Database Management
+# run as root
+
 - hosts: all
   vars_files:
     - vars.yml
   # gather_facts: false
+  become: yes
   tasks:
   - name: postgresql | setup gb locale
-    become: yes
     locale_gen:
       name: "{{ postgresql.locale }}"
       state: present
@@ -151,14 +193,12 @@
       - db
 
   - name: postgresql | get installed version
-    become: yes
     shell: 'ls /etc/postgresql/*/main/pg_hba.conf | cut -d / -f4'
     register: postgresql_version
     tags:
       - db
 
   - name: postgresql | ensure postgresql user can authenticate
-    become: yes
     lineinfile:
       path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
@@ -168,7 +208,6 @@
       - db
 
   - name: postgresql | ensure all users can authenticate
-    become: yes
     lineinfile:
       path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
@@ -180,7 +219,6 @@
       - db
 
   - name: elasticsearch | change JVM Heap To start at 256M
-    become: yes
     lineinfile:
       path: /etc/elasticsearch/jvm.options
       backup: yes
@@ -193,7 +231,6 @@
 
   handlers:
   - name: postgresql | restart postgres
-    become: yes
     service:
       name: postgresql
       state: restarted
@@ -201,12 +238,14 @@
       - db
 
   - name: elasticsearch | restart elasticsearch
-    become: yes
     service:
       name: elasticsearch
       state: started
     tags:
       - db
+
+# Database (user, data)
+# run as postgres & vagrant
 
 - hosts: all
   vars_files:
@@ -286,6 +325,8 @@
       - db
       - data
 
+# Django
+# run as vagrant
 - hosts: all
   vars_files:
     - vars.yml
@@ -307,6 +348,8 @@
     tags:
       - django
 
+# GIT config
+# run as vagrant
 - hosts: all
   vars_files:
       - vars.yml
