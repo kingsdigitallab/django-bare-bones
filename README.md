@@ -10,7 +10,7 @@ Pre-configured options include [LDAP Authentication](https://github.com/kingsdig
 2. Go into the `django-bare-bones` directory
 3. Run the bootstrap command and follow the prompts to set up the project: `./bootstrap.sh`
 4. The bootstrap script will then:
-	* Check your development environment, and install/update tools as necessary
+  * Check your development environment, and install/update tools as necessary
     * Clone a new copy of the repo into PROJECT_KEY-django. It will use the same branch you are on now.
     * Populate settings, URLs and apps selected during the installation
     * Configure bower for the selected frontend framework and compile them into /assets/vendor
@@ -23,13 +23,14 @@ Pre-configured options include [LDAP Authentication](https://github.com/kingsdig
 Bootstrap.sh accepts the following arguments:
 
 * `--help`: Displays help text
-* `--local`: Copies your local working copy of django-bare-bones rather than cloning from git. 
+* `--local`: Copies your local working copy of django-bare-bones rather than cloning from git.
 * `--no-dep-check`: Disables dependency checking. Use with extreme caution - this will cause the script to fail if a dependency is not installed. Never use for production-ready projects.
 
 ## Requirements
 To use this script successfully you will need the following on the **host** machine:
+
+* Python >= 3
 * Ansible >= 2.3
-* NodeJS
 * Vagrant >= 1.9
 * VirtualBox >= 5.0
 
@@ -68,6 +69,13 @@ For an update deployment:
 
 
 ## Changelog
+
+#### Release 0.5
+* Replaced bower with npm. __Please use npm i X to install a new js / css library__.
+* libraries are installed into node_modules folder, which is excluded from repo with .gitignore
+* package.json and package-lock.json now replace bower.json, they are generated from npm commands
+* vue.js is included by default
+* don't load google analytics if GA_ID not set
 
 #### Release 0.4.1
 * Django 2 support

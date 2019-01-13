@@ -1,3 +1,5 @@
+{% load staticfiles %}
+
 {% if GA_ID and not DEBUG %}
   <script src="{% static 'js/google_analytics.js' %}"></script>
   <script>

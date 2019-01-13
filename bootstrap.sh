@@ -141,6 +141,13 @@ else
             brew install newt;
         fi
     else
+        # Check if Whiptail is installed
+        if ! [[ $(which whiptail) ]] ; then
+            # Install Whiptail
+            echo "Please install whiptail as root: apt install whiptail"
+            exit 1;
+        fi
+    fi
 
     # Ansible
     echo "- Checking for Ansible updates"
