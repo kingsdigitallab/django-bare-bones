@@ -83,14 +83,11 @@
     tags:
       - system
 
-  - name: python | make python3 default version
-    alternatives:
-      link: /usr/bin/python
-      name: python
-      path: /usr/bin/python3
-      priority: 10
+  - name: python | install pipenv
+    pip:
+      name: pipenv
+      state: latest
     tags:
-      - system
       - python
 
   - name: npm | upgrade node.js and npm
@@ -113,41 +110,37 @@
     - vars.yml
   gather_facts: false
 
-  tasks:
-  - name: pip | install virtualenv
-    become: yes
-    pip:
-      name: virtualenv
-      state: latest
+  - name: python | requirements.txt > Pipfiles
+    # for first local deployment after bootstraping with barebone
+    command: "pipenv install --three"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/Pipfile"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
-  - name: pip | setup virtualenv
-    file: path={{ python.virtualenv_location }} state=directory
-  - command: virtualenv {{ python.virtualenv_location }}
+  - name: python | requirements-dev.txt => Pipfiles
+    # for first local deployment after bootstraping with barebone
+    shell: pipenv install -d -r $(sed "s/-r .*//g" requirements-dev.txt | tr '\n' ' ') && rm requirements*.txt
+    args:
+      chdir: "{{ project_root }}"
+      removes: "{{ project_root }}/requirements-dev.txt"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
+      
+  # todo: delete requirements.txt & requirements-dev.txt
 
-  - name: pip | update setuptools
-    pip:
-      name: setuptools
-      virtualenv: "{{ python.virtualenv_location }}"
-      state: latest
-    tags:
-      - python
-
-  - name: pip | update pip
-    pip:
-      name: pip
-      virtualenv: "{{ python.virtualenv_location }}"
-      state: latest
-    tags:
-      - python
-
-  - name: pip | ensure python requirements are installed to latest version
-    pip:
-      requirements: "{{ project_root }}/{{ python.requirements }}"
-      virtualenv: "{{ python.virtualenv_location }}"
+  - name: python | install packages from Pipfiles
+    # for second and later deployments (Pipfile already exists)
+    command: "pipenv sync -d"
+    args:
+      chdir: "{{ project_root }}"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
@@ -337,13 +330,19 @@
       - django
 
   - name: django | migrations
-    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py makemigrations"
-  - command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py migrate"
+    command: "pipenv run python manage.py makemigrations"
+    args:
+      chdir: "{{ project_root }}"
+  - command: "pipenv run python manage.py migrate"
+    args:
+      chdir: "{{ project_root }}"
     tags:
       - django
 
   - name: django | add default (vagrant/vagrant) superuser
-    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    command: "pipenv run python manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    args:
+      chdir: "{{ project_root }}"
     ignore_errors: yes # The user may already exist
     tags:
       - django

@@ -23,6 +23,7 @@ var/
 *.egg
 /.vagrant_provisioning/playbook.retry
 /node_modules
+/.venv
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
