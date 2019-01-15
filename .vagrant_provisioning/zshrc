@@ -71,8 +71,8 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 # Remounts the vagrant shared folder if needed
 [ "$(ls -A /vagrant)" ] || sudo mount -t vboxsf -o uid=1000,gid=1000 vagrant /vagrant
 
-# Activates the virtual environment
-source ~/venv/bin/activate
-
-# and moves to the project directory
+# Moves to the project directory
 cd /vagrant
+
+# and activates the virtual environment
+source .venv/bin/activate

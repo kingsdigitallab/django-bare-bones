@@ -1,13 +1,14 @@
 ---
+# Install and configure system packages
+# run as root
 - hosts: all
   vars_files:
     - vars.yml
   gather_facts: false
-  become: true
+  become: yes
 
   tasks:
   - name: fix debian sudoers file
-    become: yes
     lineinfile:
       path: /etc/sudoers
       backup: yes
@@ -19,13 +20,12 @@
   - name: apt | install https transport for apt
     apt:
       pkg: apt-transport-https
-      state: installed
+      state: present
       update_cache: yes
     tags:
       -system
 
   - name: apt | add elasticsearch key
-    become: yes
     apt_key:
       url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       state: present
@@ -41,10 +41,9 @@
 
   - name: apt | install required system packages
     apt:
-      pkg: '{{ item }}'
+      pkg: '{{ system_packages }}'
       state: present
       update_cache: yes
-    with_items: '{{ system_packages }}'
     tags:
       - system
 
@@ -70,80 +69,117 @@
       - system
 
   - name: motd | clean existing
-    become: yes
     shell: 'rm -rf /etc/update-motd.d/*'
     tags:
       - system
 
   - name: motd | deploy motd
-    become: yes
     copy: src={{ motd.file }} dest=/etc/update-motd.d/00-kdl owner=root
     tags:
       - system
 
   - name: motd | permissions
-    become: yes
     shell: 'chmod +x /etc/update-motd.d/*'
     tags:
       - system
+
+  - name: python | install pipenv
+    pip:
+      name: pipenv
+      state: latest
+    tags:
+      - python
+
+  - name: npm | upgrade node.js and npm
+    npm:
+      name: "n"
+      global: true
+    tags:
+      - system
+      - javascript
+  - command: "n stable"
+    tags:
+      - system
+      - javascript
+
+# Python and Javascript Package Managers
+# run as vagrant
 
 - hosts: all
   vars_files:
     - vars.yml
   gather_facts: false
+
   tasks:
-  - name: python | make python3 default version
-    become: yes
-    alternatives:
-      link: /usr/bin/python
-      name: python
-      path: /usr/bin/python3
-      priority: 10
-
-  - name: pip | install virtualenv
-    become: yes
-    pip:
-      name: virtualenv
-      state: latest
+  - name: python | requirements.txt => Pipfiles
+    # for first local deployment after bootstraping with barebone
+    command: "pipenv install --three"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/Pipfile"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
-  - name: pip | setup virtualenv
-    file: path={{ python.virtualenv_location }} state=directory
-  - command: virtualenv {{ python.virtualenv_location }}
+  - name: python | requirements-dev.txt => Pipfiles
+    # for first local deployment after bootstraping with barebone
+    shell: pipenv install -d $(sed 's/-r .*//g' requirements-dev.txt | tr '\n' ' ') && rm requirements*.txt
+    args:
+      chdir: "{{ project_root }}"
+      removes: "{{ project_root }}/requirements-dev.txt"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
-  - name: pip | update setuptools
-    pip:
-      name: setuptools
-      virtualenv: "{{ python.virtualenv_location }}"
-      state: latest
+  # todo: delete requirements.txt & requirements-dev.txt
+
+  - name: python | install packages from Pipfiles
+    # for second and later deployments (Pipfile already exists)
+    command: "pipenv sync -d"
+    args:
+      chdir: "{{ project_root }}"
+    environment:
+        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
-  - name: pip | update pip
-    pip:
-      name: pip
-      virtualenv: "{{ python.virtualenv_location }}"
-      state: latest
+  - name: npm | create dummy package.json
+    # this creates a dummy package.json. Needed for all other npm commands.
+    command: "npm init -y"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/package.json"
     tags:
-      - python
+      - javascript
 
-  - name: pip | ensure python requirements are installed to latest version
-    pip:
-      requirements: "{{ project_root }}/{{ python.requirements }}"
-      virtualenv: "{{ python.virtualenv_location }}"
+  - name: npm | install original javascript packages from vars.yml
+    # only for the initial setup of the repository
+    # it will install packages selected during bare-bone bootstrap
+    command: "npm i {{ npm.original_packages }}"
+    args:
+      chdir: "{{ project_root }}"
+      creates: "{{ project_root }}/package-lock.json"
     tags:
-      - python
+      - javascript
+
+  - name: npm | install javascript packages from package.json
+    npm:
+      path: "{{ project_root }}"
+    tags:
+      - javascript
+
+# Database Management
+# run as root
 
 - hosts: all
   vars_files:
     - vars.yml
   # gather_facts: false
+  become: yes
   tasks:
   - name: postgresql | setup gb locale
-    become: yes
     locale_gen:
       name: "{{ postgresql.locale }}"
       state: present
@@ -151,14 +187,12 @@
       - db
 
   - name: postgresql | get installed version
-    become: yes
     shell: 'ls /etc/postgresql/*/main/pg_hba.conf | cut -d / -f4'
     register: postgresql_version
     tags:
       - db
 
   - name: postgresql | ensure postgresql user can authenticate
-    become: yes
     lineinfile:
       path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
@@ -168,7 +202,6 @@
       - db
 
   - name: postgresql | ensure all users can authenticate
-    become: yes
     lineinfile:
       path: /etc/postgresql/{{ postgresql_version.stdout }}/main/pg_hba.conf
       backup: yes
@@ -180,7 +213,6 @@
       - db
 
   - name: elasticsearch | change JVM Heap To start at 256M
-    become: yes
     lineinfile:
       path: /etc/elasticsearch/jvm.options
       backup: yes
@@ -193,7 +225,6 @@
 
   handlers:
   - name: postgresql | restart postgres
-    become: yes
     service:
       name: postgresql
       state: restarted
@@ -201,12 +232,14 @@
       - db
 
   - name: elasticsearch | restart elasticsearch
-    become: yes
     service:
       name: elasticsearch
       state: started
     tags:
       - db
+
+# Database (user, data)
+# run as postgres & vagrant
 
 - hosts: all
   vars_files:
@@ -286,6 +319,8 @@
       - db
       - data
 
+# Django
+# run as vagrant
 - hosts: all
   vars_files:
     - vars.yml
@@ -296,17 +331,25 @@
       - django
 
   - name: django | migrations
-    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py makemigrations"
-  - command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py migrate"
+    command: "pipenv run python manage.py makemigrations"
+    args:
+      chdir: "{{ project_root }}"
+  - command: "pipenv run python manage.py migrate"
+    args:
+      chdir: "{{ project_root }}"
     tags:
       - django
 
   - name: django | add default (vagrant/vagrant) superuser
-    command: "{{ user_home }}/venv/bin/python {{ project_root }}/manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    command: "pipenv run python manage.py shell -c \"from django.contrib.auth.models import User; User.objects.create_superuser('vagrant', 'vagrant@localhost', 'vagrant')\""
+    args:
+      chdir: "{{ project_root }}"
     ignore_errors: yes # The user may already exist
     tags:
       - django
 
+# GIT config
+# run as vagrant
 - hosts: all
   vars_files:
       - vars.yml

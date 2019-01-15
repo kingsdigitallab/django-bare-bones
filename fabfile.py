@@ -11,6 +11,7 @@ from fabric.api import (cd, env, prefix, prompt, put, quiet, require, run,
                         settings, sudo, task)
 from fabric.colors import green, yellow
 from fabric.contrib import django
+from fabric.utils import abort
 
 # put project directory in path
 project_root = os.path.abspath(os.path.dirname(__file__))
@@ -30,7 +31,6 @@ PROJECT_NAME = '$PROJECT_NAME'
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
 
-
 env.gateway = 'ssh.kdl.kcl.ac.uk'
 # Host names used as deployment targets
 env.hosts = ['{}.kdl.kcl.ac.uk'.format(PROJECT_NAME)]
@@ -39,7 +39,8 @@ env.root_path = '/vol/{}/webroot/'.format(PROJECT_NAME)
 # Absolute filesystem path to project Django root
 env.django_root_path = '/vol/{}/webroot/'.format(PROJECT_NAME)
 # Absolute filesystem path to Python virtualenv for this project
-env.envs_path = os.path.join(env.root_path, 'envs')
+# TODO: create symlink to .venv within project folder
+# env.envs_path = os.path.join(env.root_path, 'envs')
 # -------------------------------
 
 django.project(PROJECT_NAME)
@@ -57,6 +58,7 @@ env.user = django_settings.FABRIC_USER
 
 def server(func):
     """Wraps functions that set environment variables for servers"""
+
     @wraps(func)
     def decorated(*args, **kwargs):
         try:
@@ -65,6 +67,7 @@ def server(func):
             env.servers = [func]
 
         return func(*args, **kwargs)
+
     return decorated
 
 
@@ -101,8 +104,8 @@ def set_srvr_vars():
 @task
 def setup_environment(version=None):
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
-    create_virtualenv()
     clone_repo()
+    create_virtualenv()
     update(version)
     install_requirements()
 
@@ -110,23 +113,25 @@ def setup_environment(version=None):
 @task
 def create_virtualenv():
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    env_vpath = get_virtual_env_path()
     with quiet():
-        env_vpath = get_virtual_env_path()
         if run('ls {}'.format(env_vpath)).succeeded:
             print(
                 green('virtual environment at [{}] exists'.format(env_vpath)))
             return
 
+    # All we need is a .venv dir in the project folder;
+    # 'pipenv install' will set it up first time
     print(yellow('setting up virtual environment in [{}]'.format(env_vpath)))
-    run('virtualenv {}'.format(env_vpath))
+    run('mkdir {}'.format(env_vpath))
 
 
 def get_virtual_env_path():
     '''Returns the absolute path to the python virtualenv for the server
     (dev, stg, live) we are working on.
-    E.g. /vol/tvof/webroot/envs/dev
+    E.g. /vol/tvof/webroot/.../.venv
     '''
-    return os.path.join(env.envs_path, env.srvr)
+    return os.path.join(env.path, '.venv')
 
 
 @task
@@ -145,27 +150,35 @@ def clone_repo():
 @task
 def install_requirements():
 
+    require('srvr', 'path', provided_by=env.servers)
+
+    create_virtualenv()
+    
     fix_permissions('virtualenv')
 
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    with cd(env.path):
+        check_pipenv()
+        run('pipenv sync')
+        run('pipenv clean')
 
-    reqs = 'requirements-{}.txt'.format(env.srvr)
 
-    try:
-        assert os.path.exists(reqs)
-    except AssertionError:
-        reqs = 'requirements.txt'
-
-    with cd(env.path), prefix(env.within_virtualenv):
-        run('pip install -q --no-cache -U -r {}'.format(reqs))
+@task
+def check_pipenv():
+    with quiet():
+        if run('which pipenv').failed:
+            abort('pipenv is missing, '
+                  'please install it as root with "pip install pipenv"')
 
 
 @task
 def reinstall_requirement(which):
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
 
-    with cd(env.path), prefix(env.within_virtualenv):
-        run('pip uninstall {0} && pip install --no-deps {0}'.format(which))
+    with cd(env.path):
+        check_pipenv()
+        run('pipenv uninstall --all --clear')
+    
+    install_requirements()
 
 
 @task
@@ -185,7 +198,7 @@ def deploy(version=None):
 
 @task
 def update(version=None):
-    require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+    require('srvr', 'path', provided_by=env.servers)
 
     if version:
         # try specified version first
@@ -197,7 +210,7 @@ def update(version=None):
         # else deploy to master branch
         to_version = 'master'
 
-    with cd(env.path), prefix(env.within_virtualenv):
+    with cd(env.path):
         run('git pull')
         run('git checkout {}'.format(to_version))
 
@@ -291,6 +304,9 @@ def migrate(app=None):
 @task
 def collect_static(process=False):
     require('srvr', 'path', 'within_virtualenv', provided_by=env.servers)
+
+    with cd(env.path):
+        run('npm i')
 
     if env.srvr in ['local', 'vagrant']:
         print(yellow('Do not run collect_static on local servers'))

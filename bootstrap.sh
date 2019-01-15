@@ -14,14 +14,14 @@
 # --help : Prints help
 # --local : clones your local working copy rather than cloning from git
 # --no-dep-check : Skips the dependency checking
-# 
+#
 # Important: --no-dep-check should be used for debugging only!
 
 # Check for help flag:
 if [[ "${@#--help}" != "$@" ]] ; then
     echo
     echo "This script creates a new django-based project, built around the KDL infrastructure. It uses Vagrant for provisioning and Fabric for deployment If run with no parameters, the script will check all dependencies and clone a new django-bare-bones instane from git."
-    echo 
+    echo
     echo "Bootstrap takes the following arguments:"
     echo
     echo "--help         : Displays this help message"
@@ -42,7 +42,7 @@ BS_PH_URLS=""
 BS_PH_MIDDLEWARE=""
 BS_PH_REQUIREMENTS=""
 BS_PH_URL_IMPORTS=""
-BS_PH_BOWER_FRAMEWORK=""
+BS_PH_CSS_FRAMEWORK=""
 BS_PH_CONTEXT_PROCESSORS=""
 
 # Captures sigint/sigterm
@@ -61,7 +61,7 @@ function control_c {
 }
 
 # Checks if the cancel button was pressed in whiptail, and
-# if so, exits. Run this **directly** after calling 
+# if so, exits. Run this **directly** after calling
 # whiptail.
 function whiptail_check_cancel {
     exitcode=$?
@@ -113,7 +113,7 @@ else
         exit 1
     else
         vagrant_version="$(vagrant --version | cut -d' ' -f2)"
-        if [ "$vagrant_version" \< "1.9" ] ; then 
+        if [ "$vagrant_version" \< "1.9" ] ; then
             echo
             echo "#############################################"
             echo "Vagrant 1.9 or later is required, please"
@@ -140,26 +140,16 @@ else
             echo "- Installing Whiptail (this will only need to be done once)"
             brew install newt;
         fi
-
-        # Check if npm is installed
-        if ! [[ $(which npm) ]] ; then
+    else
+        # Check if Whiptail is installed
+        if ! [[ $(which whiptail) ]] ; then
             # Install Whiptail
-            echo "- Installing Node :(this will only need to be done once)"
-            brew install npm;
-        fi
-    else    
-
-    # Linux
-    # Check if npm is installed
-        if ! [[ $(which npm) ]] ; then
-            # Install Whiptail
-            echo "- Installing Node :(this will only need to be done once)"
-            sudo apt-get update
-            sudo apt-get -y install npm
+            echo "Please install whiptail as root: apt install whiptail"
+            exit 1;
         fi
     fi
 
-    # Ansible 
+    # Ansible
     echo "- Checking for Ansible updates"
     pip3 install --user --upgrade ansible
 
@@ -174,18 +164,13 @@ else
         echo "- Installing Isort"
         pip3 install --user isort
     fi
-
-    # NodeJS Dependencies
-    if ! [[ $(which bower) ]] ; then
-        npm install -g bower
-    fi
 fi
 
 # Get project info (dont accept blank entries here!)
 BS_PROJECT_KEY=""
 while [[ $BS_PROJECT_KEY == "" ]] ; do
     BS_PROJECT_KEY=$(whiptail --title "$TITLE" --inputbox "Choose a project key.\n\nThis should be the short project name which is used as the VM name." 10 40 3>&1 1>&2 2>&3)
-    whiptail_check_cancel 
+    whiptail_check_cancel
 done
 
 BS_PROJECT_TITLE=""
@@ -205,10 +190,10 @@ BS_SELECTIONS=$(whiptail --title "$TITLE" --checklist "Select Project Options:" 
 whiptail_check_cancel
 
 # Get frontend framework choice
-BS_BOWER_FRAMEWORK=$(whiptail --title "$TITLE" --menu "Select UI Framework:" 20 78 8 \
+BS_CSS_FRAMEWORK=$(whiptail --title "$TITLE" --menu "Select UI Framework:" 20 78 8 \
 "bulma" "Bulma CSS: http://bulma.io" \
 "foundation-sites" "Foundation (Full): http://foundation.zurb.com" \
-"none" "Don't install any UI Framework" 3>&1 1>&2 2>&3)
+"" "Don't install any UI Framework" 3>&1 1>&2 2>&3)
 whiptail_check_cancel
 
 # Declare functions for options:
@@ -220,15 +205,15 @@ function func_digger {
     BS_DIGGER_PROJECT_ID=$(whiptail --title "$TITLE" --inputbox "Enter the Activecollab Project ID to use for Digger in $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3);
     whiptail_check_cancel
 
-    export BS_DIGGER_USER_ID=$BS_DIGGER_USER_ID
-    export BS_DIGGER_PROJECT_ID=$BS_DIGGER_PROJECT_ID
+    export BS_DIGGER_USER_ID
+    export BS_DIGGER_PROJECT_ID
 }
 
 # LDAP
 function func_ldap {
     BS_LDAP_GROUP=$(whiptail --title "$TITLE" --inputbox "Enter the LDAP group for $BS_PROJECT_KEY." 10 40 3>&1 1>&2 2>&3)
     whiptail_check_cancel
-    export BS_LDAP_GROUP=$BS_LDAP_GROUP
+    export BS_LDAP_GROUP
 }
 
 # Get Selected Options
@@ -251,12 +236,6 @@ do
     BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)"
 done
 
-# Build bower placeholder
-echo "- Building bower requirements"
-if [[ "$BS_BOWER_FRAMEWORK" != "none" ]]; then
-    BS_PH_BOWER_FRAMEWORK="    \"$BS_BOWER_FRAMEWORK\": null"
-fi
-
 # Call option-specific functions
 echo "- Setting up selected applications"
 for option in "${BS_PROJECT_OPTIONS[@]}"
@@ -272,15 +251,15 @@ do
     esac
 done
 
-export BS_PH_CONTEXT_PROCESSORS=$BS_PH_CONTEXT_PROCESSORS
-export BS_PH_SETTINGS_INLINE=$BS_PH_SETTINGS_INLINE
-export BS_PH_SETTINGS_MODULES=$BS_PH_SETTINGS_MODULES
-export BS_PH_INSTALLED_APPS=$BS_PH_INSTALLED_APPS
-export BS_PH_URLS=$BS_PH_URLS
-export BS_PH_MIDDLEWARE=$BS_PH_MIDDLEWARE
-export BS_PH_REQUIREMENTS=$BS_PH_REQUIREMENTS
-export BS_PH_URL_IMPORTS=$BS_PH_URL_IMPORTS
-export BS_PH_BOWER_FRAMEWORK=$BS_PH_BOWER_FRAMEWORK
+export BS_PH_CONTEXT_PROCESSORS
+export BS_PH_SETTINGS_INLINE
+export BS_PH_SETTINGS_MODULES
+export BS_PH_INSTALLED_APPS
+export BS_PH_URLS
+export BS_PH_MIDDLEWARE
+export BS_PH_REQUIREMENTS
+export BS_PH_URL_IMPORTS
+export BS_PH_CSS_FRAMEWORK=$BS_CSS_FRAMEWORK
 
 # Here we go!
 cd ../
@@ -310,14 +289,10 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_MIDDLEWARE:$ENV{BS_PH_MIDDLEWARE}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_REQUIREMENTS:$ENV{BS_PH_REQUIREMENTS}:g' {} \;
 find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_URL_IMPORTS:$ENV{BS_PH_URL_IMPORTS}:g' {} \;
-if [[ "$BS_BOWER_FRAMEWORK" != "none" ]]; then
-    perl -pi -e 's:\$PH_BOWER_FRAMEWORK:,\n$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
-else
-    perl -pi -e 's:\$PH_BOWER_FRAMEWORK:\n$ENV{BS_PH_BOWER_FRAMEWORK}:g' bower.json
-fi
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\$PH_CSS_FRAMEWORK:$ENV{BS_PH_CSS_FRAMEWORK}:g' {} \;
 
-export BS_PROJECT_KEY=$BS_PROJECT_KEY
-export BS_PROJECT_TITLE=$BS_PROJECT_TITLE
+export BS_PROJECT_KEY
+export BS_PROJECT_TITLE
 
 
 # Generic Replacements
@@ -331,7 +306,7 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 
 # Fix newlines
 echo "- Fixing new lines"
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" ! -iname "*.yml" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
 
 
 # Check if a catch-all URL exists and move it if needed
@@ -357,10 +332,6 @@ else
     # Move the catch all url
     perl -pi -e 's:\$PH_CATCH_ALL_URL:$ENV{BS_CATCH_ALL_URL}:g' project_name/urls.py
 fi
-
-# Run bower
-echo "- Running Bower"
-bower install
 
 # Tidy Up
 echo "- Tidying up"
