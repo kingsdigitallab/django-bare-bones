@@ -110,7 +110,8 @@
     - vars.yml
   gather_facts: false
 
-  - name: python | requirements.txt > Pipfiles
+  tasks:
+  - name: python | requirements.txt => Pipfiles
     # for first local deployment after bootstraping with barebone
     command: "pipenv install --three"
     args:
@@ -123,7 +124,7 @@
 
   - name: python | requirements-dev.txt => Pipfiles
     # for first local deployment after bootstraping with barebone
-    shell: pipenv install -d -r $(sed "s/-r .*//g" requirements-dev.txt | tr '\n' ' ') && rm requirements*.txt
+    shell: pipenv install -d $(sed 's/-r .*//g' requirements-dev.txt | tr '\n' ' ') && rm requirements*.txt
     args:
       chdir: "{{ project_root }}"
       removes: "{{ project_root }}/requirements-dev.txt"
@@ -131,7 +132,7 @@
         PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
-      
+
   # todo: delete requirements.txt & requirements-dev.txt
 
   - name: python | install packages from Pipfiles
