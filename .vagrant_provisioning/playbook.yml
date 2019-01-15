@@ -362,7 +362,7 @@
       - git
 
   - name: git | flake8 pre-commit hook
-    command: "{{ user_home }}/venv/bin/flake8 --install-hook=git"
+    command: "pipenv run flake8 --install-hook=git"
     ignore_errors: yes # Stop errors if it already exists
     args:
       chdir: "{{ project_root }}"
