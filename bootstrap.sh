@@ -306,7 +306,7 @@ find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's
 
 # Fix newlines
 echo "- Fixing new lines"
-find . -path ./.git -prune -o -type f \( ! -iname "*.sh" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
+find . -path ./.git -prune -o -type f \( ! -iname "*.sh" ! -iname "*.yml" \) -exec perl -pi -e 's:\\n:\n:g' {} \;
 
 
 # Check if a catch-all URL exists and move it if needed
