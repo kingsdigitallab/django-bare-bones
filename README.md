@@ -69,9 +69,9 @@ For an update deployment:
 
 ## Changelog
 
-#### Release 0.5 (Geoffroy Noel)
+#### Release 0.5 (Jan 2019, Geoffroy Noel)
 * Tested with Django 2.1.5 & Wagtail 2.4
-* __Replaced pip with pipenv & bower with npm__, please familiarise yourself with those two tools
+* __Replaced pip with pipenv & bower with npm__, [please familiarise yourself with those two tools](//github.com/kingsdigitallab/django-bare-bones/wiki)
 
 * Please make sure __you install python packages with pipenv and NOT pip from now on__
 * requirements.txt and requirements-dev.txt are no longer used. Pipfiles replace them.
