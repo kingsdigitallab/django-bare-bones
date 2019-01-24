@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os.path
 import sys
 from functools import wraps
@@ -18,32 +16,56 @@ project_root = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(project_root)
 
 # -------------------------------
-# SETTINGS VARIABLES
-# Please verify each variable below and edit as necessary to match
-# your project configuration.
-# TODO: externalise to settings to base.py
-# so this becomes a generic script without project-specific code.
+''' SETTINGS VARIABLES: read from your Django settings files.
+All optional.
+
+Please keep this file generic, all hard-coded values should go to settings.
+
+FABRIC_SERVER_NAME: short name of the server to deploy to (e.g. ncse2)
+    default: PROJECT_NAME
+FABRIC_GATEWAY: e.g. myusername@my.ssh.proxy.com
+    default: don't use a gateway, acces remote server directly
+FABRIC_USER: name of user used to execute command on remote server
+    default: name of user who started fab
+
+'''
+
 
 # The name of the Django app for this project
-# Folder that contains wsgi.py
-PROJECT_NAME = '$PROJECT_NAME'
+# Folder that contains settings/local.py
+def find_project_name():
+    ret = None
+    for name in os.listdir(project_root):
+        if os.path.exists(os.path.join(
+            project_root, name, 'settings', 'local.py')):
+            if ret is not None:
+                raise Exception('Ambiguous project name')
+            ret = name
+    if not ret:
+        raise Exception('Could not find your Django project folder')
+    return ret
+
+
+PROJECT_NAME = find_project_name()
+django.project(PROJECT_NAME)
+
+SERVER_NAME = getattr(django_settings, 'FABRIC_SERVER_NAME', PROJECT_NAME)
+
 # Git repository pointer
 REPOSITORY = 'https://github.com/kingsdigitallab/{}-django.git'.format(
     PROJECT_NAME)
 
 env.gateway = 'ssh.kdl.kcl.ac.uk'
 # Host names used as deployment targets
-env.hosts = ['{}.kdl.kcl.ac.uk'.format(PROJECT_NAME)]
+env.hosts = ['{}.kdl.kcl.ac.uk'.format(SERVER_NAME)]
 # Absolute filesystem path to project 'webroot'
-env.root_path = '/vol/{}/webroot/'.format(PROJECT_NAME)
+env.root_path = '/vol/{}/webroot/'.format(SERVER_NAME)
 # Absolute filesystem path to project Django root
-env.django_root_path = '/vol/{}/webroot/'.format(PROJECT_NAME)
+env.django_root_path = '/vol/{}/webroot/'.format(SERVER_NAME)
 # Absolute filesystem path to Python virtualenv for this project
 # TODO: create symlink to .venv within project folder
 # env.envs_path = os.path.join(env.root_path, 'envs')
 # -------------------------------
-
-django.project(PROJECT_NAME)
 
 # Set FABRIC_GATEWAY = 'username@proxy.x' in local.py
 # if you are behind a proxy.
@@ -153,7 +175,7 @@ def install_requirements():
     require('srvr', 'path', provided_by=env.servers)
 
     create_virtualenv()
-    
+
     fix_permissions('virtualenv')
 
     with cd(env.path):
@@ -177,7 +199,7 @@ def reinstall_requirement(which):
     with cd(env.path):
         check_pipenv()
         run('pipenv uninstall --all --clear')
-    
+
     install_requirements()
 
 
@@ -265,21 +287,23 @@ def fix_permissions(category='static'):
 
     processed = False
 
-    with quiet():
+    dir_names = ['static', 'logs', 'django_cache']
+
+    with cd(env.path), quiet():
         if category == 'static':
             processed = True
-            log_path = os.path.join(env.path, 'logs', 'django.log')
-            if run('ls {}'.format(log_path)).succeeded:
-                sudo('setfacl -R -m g:www-data:rwx {0}/logs {0}/static'.
-                     format(env.path))
-                sudo('setfacl -R -d -m g:www-data:rwx {0}/logs {0}/static'.
-                     format(env.path))
-                sudo('setfacl -R -m g:kdl-staff:rwx {0}/logs {0}/static'.
-                     format(env.path))
-                sudo('setfacl -R -d -m g:kdl-staff:rwx {0}/logs {0}/static'.
-                     format(env.path))
-                sudo('chgrp -Rf kdl-staff {}'.format(env.path))
-                sudo('chmod -Rf g+w {}'.format(env.path))
+
+            for dir_name in dir_names:
+                if run('ls "{}"'.format(dir_name)).succeeded:
+                    sudo('setfacl -R -m g:www-data:rwx "{}"'.format(dir_name))
+                    sudo('setfacl -R -d -m g:www-data:rwx "{}"'.
+                         format(dir_name))
+                    sudo('setfacl -R -m g:kdl-staff:rwx "{}"'.format(dir_name))
+                    sudo('setfacl -R -d -m g:kdl-staff:rwx "{}"'.
+                         format(dir_name))
+                    sudo('chgrp -Rf kdl-staff "{}"'.format(dir_name))
+                    sudo('chmod -Rf g+w "{}"'.format(dir_name))
+
         if category == 'virtualenv':
             path = get_virtual_env_path()
             sudo('chgrp -Rf kdl-staff {}'.format(path))
