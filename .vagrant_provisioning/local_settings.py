@@ -33,18 +33,16 @@ AUTHENTICATION_BACKENDS = (
 # http://django-debug-toolbar.readthedocs.org/en/latest/
 # -----------------------------------------------------------------------------
 
-try:
-    import debug_toolbar  # noqa
+# try:
+#     import debug_toolbar  # noqa
 
-    INSTALLED_APPS = INSTALLED_APPS + ['debug_toolbar']
-    MIDDLEWARE += [
-        'debug_toolbar.middleware.DebugToolbarMiddleware']
-    DEBUG_TOOLBAR_PATCH_SETTINGS = True
-except ImportError:
-    pass
+#     INSTALLED_APPS = INSTALLED_APPS + ['debug_toolbar']
+#     MIDDLEWARE += [
+#         'debug_toolbar.middleware.DebugToolbarMiddleware']
+#     DEBUG_TOOLBAR_PATCH_SETTINGS = True
+# except ImportError:
+#     pass
 
 LOGGING['loggers']['$PROJECT_NAME'] = {}
 LOGGING['loggers']['$PROJECT_NAME']['handlers'] = ['console']
 LOGGING['loggers']['$PROJECT_NAME']['level'] = logging.DEBUG
-
-
