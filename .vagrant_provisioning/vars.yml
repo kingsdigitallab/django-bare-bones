@@ -1,20 +1,61 @@
 ansible_python_interpreter: /usr/bin/python3
-app: {name: $PROJECT_NAME}
-git: {url: 'https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh'}
-motd: {file: 00-kdl}
-npm: {original_packages: 'jquery vue $PH_CSS_FRAMEWORK'}
-postgresql: {admin_user: postgres, cluster_name: main, cluster_reset: false, default_auth_method: trust,
-  encoding: UTF-8, initial_data_file: data.sql, locale: en_GB.UTF-8, user: $PROJECT_NAME}
+app: { name: $PROJECT_NAME }
+motd: { file: 00-kdl }
+npm: { original_packages: "jquery vue $PH_CSS_FRAMEWORK" }
+postgresql:
+  {
+    admin_user: postgres,
+    cluster_name: main,
+    cluster_reset: false,
+    default_auth_method: trust,
+    encoding: UTF-8,
+    initial_data_file: data.sql,
+    locale: en_GB.UTF-8,
+    user: $PROJECT_NAME,
+  }
 project_root: /vagrant
-python: {requirements: requirements-dev.txt, virtualenv_location: /home/vagrant/venv}
-system_packages: [ack-grep, adminer, aptitude, binutils, elasticsearch, gdal-bin, git, git-core, libgdal-dev, libjpeg-dev,
-  libldap2-dev, libproj-dev,libsasl2-dev, libssl-dev, libxml2-dev, libxslt-dev, nfs-common, open-vm-tools,
-  openjdk-8-jre,
-  postgis, postgresql, postgresql-client, postgresql-server-dev-all,
-  python3-dev, python3-gdal, python3-pip, python3-psycopg2, python3-setuptools,
-  vim-nox, zsh, redis-server,
-  # wget is needed for upgrading node & npm to latest version (https://www.npmjs.com/package/n)
-  wget, npm
-]
+python:
+  {
+    requirements: requirements-dev.txt,
+    virtualenv_location: /home/vagrant/venv,
+  }
+# wget is needed for upgrading node & npm to latest version (https://www.npmjs.com/package/n)
+system_packages:
+  [
+    ack-grep,
+    adminer,
+    aptitude,
+    binutils,
+    elasticsearch,
+    gdal-bin,
+    git-core,
+    git,
+    libgdal-dev,
+    libjpeg-dev,
+    libldap2-dev,
+    libproj-dev,
+    libsasl2-dev,
+    libssl-dev,
+    libxml2-dev,
+    libxslt-dev,
+    nfs-common,
+    npm,
+    open-vm-tools,
+    openjdk-8-jre,
+    postgis,
+    postgresql-client,
+    postgresql-server-dev-all,
+    postgresql,
+    python3-dev,
+    python3-gdal,
+    python3-pip,
+    python3-psycopg2,
+    python3-setuptools,
+    redis-server,
+    vim-nox,
+    wget,
+    zsh,
+  ]
 user_home: /home/vagrant
-zsh: {oh_my_zsh: 'https://github.com/robbyrussell/oh-my-zsh.git', zshrc: zshrc}
+zsh:
+  { oh_my_zsh: "https://github.com/robbyrussell/oh-my-zsh.git", zshrc: zshrc }
