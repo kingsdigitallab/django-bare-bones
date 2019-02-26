@@ -62,7 +62,7 @@ target/
 .DS_Store
 .babelrc
 .vagrant
+.vscode
 local.py
-#local_*.py
 logs/
 static/
