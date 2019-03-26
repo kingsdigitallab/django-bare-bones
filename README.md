@@ -69,6 +69,9 @@ For an update deployment:
 
 ## Changelog
 
+#### Release 0.5.1
+* Modified Pipenv configuration to no longer store the virtualenv under the project directory (See https://www.virtualbox.org/ticket/8761 )
+
 #### Release 0.5 (Jan 2019, Geoffroy Noel)
 * Tested with Django 2.1.5 & Wagtail 2.4
 * __Replaced pip with pipenv & bower with npm__, [please familiarise yourself with those two tools](//github.com/kingsdigitallab/django-bare-bones/wiki)

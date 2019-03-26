@@ -117,8 +117,6 @@
     args:
       chdir: "{{ project_root }}"
       creates: "{{ project_root }}/Pipfile"
-    environment:
-        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
@@ -128,8 +126,6 @@
     args:
       chdir: "{{ project_root }}"
       removes: "{{ project_root }}/requirements-dev.txt"
-    environment:
-        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
@@ -140,8 +136,6 @@
     command: "pipenv sync -d"
     args:
       chdir: "{{ project_root }}"
-    environment:
-        PIPENV_VENV_IN_PROJECT: "1"
     tags:
       - python
 
