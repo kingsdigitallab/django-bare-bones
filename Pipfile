@@ -1,0 +1,30 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+django-debug-toolbar = "*"
+fabric3 = "*"
+flake8 = "*"
+ipython = "*"
+pycodestyle = "*"
+tox = "*"
+tox-pipenv = "*"
+
+[packages]
+django = "*"
+django_compressor = "*"
+django-extensions = "*"
+django-libsass = "*"
+django-model-utils = "*"
+django-redis = "*"
+psycopg2-binary = "*"
+redis = "*"
+
+elasticsearch = ">=5.0,<6.0"
+
+$PH_REQUIREMENTS
+
+[requires]
+python_version = "3.5"

@@ -232,7 +232,7 @@ do
     BS_PH_INSTALLED_APPS=$"$BS_PH_INSTALLED_APPS\n$(cat .modules/$option/installed_apps)"
     BS_PH_URLS=$"$BS_PH_URLS\n$(cat .modules/$option/urls)"
     BS_PH_MIDDLEWARE=$"$BS_PH_MIDDLEWARE\n$(cat .modules/$option/middleware)"
-    BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/requirements)"
+    BS_PH_REQUIREMENTS=$"$BS_PH_REQUIREMENTS\n$(cat .modules/$option/Pipfile)"
     BS_PH_URL_IMPORTS=$"$BS_PH_URL_IMPORTS\n$(cat .modules/$option/url_imports)"
 done
 

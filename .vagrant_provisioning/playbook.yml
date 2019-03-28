@@ -111,25 +111,13 @@
   gather_facts: false
 
   tasks:
-  - name: python | requirements.txt => Pipfiles
-    # for first local deployment after bootstraping with barebone
-    command: "pipenv install --three"
+  - name: python | lock pipfiles packages
+    # for second and later deployments (Pipfile already exists)
+    command: "pipenv lock"
     args:
       chdir: "{{ project_root }}"
-      creates: "{{ project_root }}/Pipfile"
     tags:
       - python
-
-  - name: python | requirements-dev.txt => Pipfiles
-    # for first local deployment after bootstraping with barebone
-    shell: pipenv install -d $(sed 's/-r .*//g' requirements-dev.txt | tr '\n' ' ') && rm requirements*.txt
-    args:
-      chdir: "{{ project_root }}"
-      removes: "{{ project_root }}/requirements-dev.txt"
-    tags:
-      - python
-
-  # todo: delete requirements.txt & requirements-dev.txt
 
   - name: python | install packages from Pipfiles
     # for second and later deployments (Pipfile already exists)

@@ -1,6 +1,0 @@
--r requirements.txt
-django-debug-toolbar
-Fabric3
-flake8
-ipython
-tox
