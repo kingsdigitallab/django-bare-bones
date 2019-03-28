@@ -1,7 +1,7 @@
 from .base import *  # noqa
 
 ALLOWED_HOSTS = ['127.0.0.1',
-                 'localhost'
+                 'localhost',
                  '[::1]',
                  '$PROJECT_NAME-dev.kdl.kcl.ac.uk']
 
