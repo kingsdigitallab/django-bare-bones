@@ -69,6 +69,9 @@ For an update deployment:
 
 ## Changelog
 
+#### Release 0.5.2
+* Fixed tox/travis config
+
 #### Release 0.5.1
 * Modified Pipenv configuration to no longer store the virtualenv under the project directory (See https://www.virtualbox.org/ticket/8761 )
 

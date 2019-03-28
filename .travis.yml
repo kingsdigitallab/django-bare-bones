@@ -5,6 +5,8 @@ python:
 
 install:
   - pip install tox-travis
+  - 'pip install pipenv'
+  - 'pipenv sync -d'
 
 script:
   - tox
