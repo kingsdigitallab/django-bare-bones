@@ -1,5 +1,6 @@
 {
   "indent_size": 2,
   "indent_handlebars": true,
-  "indent_inner_html": true
+  "indent_inner_html": true,
+  "wrap_line_length": 80
 }
