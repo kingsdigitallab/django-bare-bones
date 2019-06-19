@@ -69,6 +69,10 @@ For an update deployment:
 
 ## Changelog
 
+#### Release 0.5.3
+* Fix issues
+* Add editor config files
+
 #### Release 0.5.2
 * Fixed tox/travis config
 
