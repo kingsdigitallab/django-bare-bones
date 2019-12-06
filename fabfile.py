@@ -5,12 +5,13 @@ from functools import wraps
 
 from django.conf import settings as django_settings
 from django.core.management.utils import get_random_secret_key
-from fabric.api import (cd, env, prompt, put, quiet, require, run,
-                        settings, sudo, task)
+from fabric.api import (
+    cd, env, prompt, put, quiet, require, run, settings, sudo, task
+)
 from fabric.colors import green, yellow
 from fabric.contrib import django
-from fabric.utils import abort
 from fabric.contrib.files import exists
+from fabric.utils import abort
 
 # put project directory in path
 project_root = os.path.abspath(os.path.dirname(__file__))
@@ -162,6 +163,7 @@ def setup_environment(version=None):
     require('srvr', provided_by=env.servers)
 
     clone_repo()
+    fix_permissions()
     update(version)
     install_requirements()
 
@@ -184,7 +186,6 @@ def install_requirements():
     require('srvr', 'path', provided_by=env.servers)
 
     create_virtualenv()
-    fix_permissions('virtualenv')
 
     dev_flag = ''
     if is_vagrant():
@@ -242,6 +243,12 @@ def reinstall_requirement():
 
 @task
 def deploy(version=None):
+    '''
+    GN: permission-fixing has been removed from this process.
+    Because the new version should be more sustainable.
+    Only call fab dev fix_permissions when you have issues.
+    Now the deploy process can be run entirely without sudo.
+    '''
     update(version)
     install_requirements()
     upload_local_settings()
@@ -251,8 +258,6 @@ def deploy(version=None):
     # clear_cache()
     touch_wsgi()
     check_deploy()
-    fix_permissions()
-    own_django_log()
 
 
 @task
@@ -270,8 +275,11 @@ def update(version=None):
         to_version = 'master'
 
     with cd(env.path):
-        run('git pull')
+        # keep this sequence as it will cope well with change of branch
+        # during deployment.
+        run('git fetch')
         run('git checkout {}'.format(to_version))
+        run('git merge')
 
     update_dev_packages()
 
@@ -349,50 +357,52 @@ def own_django_log():
 
 
 @task
-def fix_permissions(category='static'):
+def fix_permissions():
     '''
-    Reset the permissions on various paths.
-    category: determines which set of paths to work on:
-        'static' (default): django static path + general project path
-        'virtualenv': fix the virtualenv permissions
+    Reset all permissions in the django project.
+    Uses facl for www-data, with defaults for newly created files.
+    This permission configuration should cope with changes
+    from www-data and kdl-staff users and support multiple deployments
+    from various kdl-staff.
     '''
     if is_vagrant():
         return
 
     require('srvr', 'path', provided_by=env.servers)
 
-    processed = False
-
     with cd(env.path), quiet():
-        if category == 'static':
-            processed = True
+        # write access to kdl-staff and current user
+        # read access to www-data
+        paths = '.'
+        path_venv = get_virtual_env_path()
+        if path_venv is not None:
+            paths += ' ' + path_venv
 
-            dir_names = ['static', 'logs', 'django_cache']
+        sudo('setfacl -R -b {}'.format(paths))
+        sudo('chown -Rf {}:kdl-staff {}'.format(env.user, paths))
+        sudo('chmod -Rf u+rw,g+rw,o-rwx {}'.format(paths))
+        sudo((
+            'setfacl -R -d -m u:www-data:rx,g:kdl-staff:rwx,o::---,m::rwx {}'
+        ).format(paths))
+        sudo('setfacl -R -m u:www-data:rx {}'.format(paths))
 
-            for dir_name in dir_names:
-                if exists(dir_name):
-                    sudo('setfacl -R -m g:www-data:rwx "{}"'.format(dir_name))
-                    sudo('setfacl -R -d -m g:www-data:rwx "{}"'.
-                         format(dir_name))
-                    sudo('setfacl -R -m g:kdl-staff:rwx "{}"'.format(dir_name))
-                    sudo('setfacl -R -d -m g:kdl-staff:rwx "{}"'.
-                         format(dir_name))
-                    sudo('chgrp -Rf kdl-staff "{}"'.format(dir_name))
-                    sudo('chmod -Rf g+w "{}"'.format(dir_name))
+        # write access for www-data only where needed
+        paths = [
+            'logs',
+            'static',
+            'media',
+            'django_cache',
+        ]
 
-        if category == 'virtualenv':
-            processed = True
+        paths = ' '.join([
+            path
+            for path
+            in paths
+            if path and exists(path)
+        ])
 
-            path = get_virtual_env_path()
-            if path is not None:
-                sudo('chgrp -Rf kdl-staff {}'.format(path))
-                sudo('chmod -Rf g+rw {}'.format(path))
-
-    if not processed:
-        raise Exception(
-            'fix_permission(category="{}"): unrecognised category name.'.
-            format(category)
-        )
+        sudo('setfacl -R -d -m u:www-data:rwx {}'.format(paths))
+        sudo('setfacl -R -m u:www-data:rwx {}'.format(paths))
 
 
 @task
